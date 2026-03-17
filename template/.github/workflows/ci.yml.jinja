@@ -1,0 +1,97 @@
+name: ci
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+  # manual
+  workflow_dispatch:
+
+env:
+  UV_VERSION: {{ uv_version }}
+  TOX_VERSION: {{ tox_version }}
+  PRE_COMMIT_CACHE: ~/.cache/pre-commit
+
+jobs:
+  tox-precommit:
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version:
+          - "{{ python_version }}"
+        os: [ubuntu-latest]
+        env:
+          - TOXENV: "pre-commit"
+    runs-on: {% raw %}${{ matrix.os }}{% endraw %}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure Python {% raw %}${{ matrix.python-version }}{% endraw %}
+        uses: actions/setup-python@v5
+        with:
+          python-version: {% raw %}${{ matrix.python-version }}{% endraw %}
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          version: {% raw %}${{ env.UV_VERSION }}{% endraw %}
+          enable-cache: true
+          cache-suffix: {% raw %}${{ matrix.os }}-${{ matrix.python-version }}-uv_pre-commit{% endraw %}
+      - name: Install tox
+        run: uv tool install --python-preference only-system tox=={% raw %}${{ env.TOX_VERSION }}{% endraw %} --with tox-gh
+      - name: Cache pre-commit
+        uses: actions/cache@v4
+        with:
+          path: {% raw %}${{ env.PRE_COMMIT_CACHE }}{% endraw %}
+          key: {% raw %}${{ matrix.os }}-${{ matrix.python-version }}-pre-commit-${{ hashFiles('.pre-commit-config.yaml') }}{% endraw %}
+      - name: Run tox
+        run: |
+          tox
+        shell: bash
+        env: {% raw %}${{ matrix.env }}{% endraw %}
+  tox-tests:
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version:
+        {%- for python_version in supported_python_versions.split(',') %}
+          - "{{ python_version|trim }}"
+        {%- endfor %}
+        os: [ubuntu-latest]
+    runs-on: {% raw %}${{ matrix.os }}{% endraw %}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure Python {% raw %}${{ matrix.python-version }}{% endraw %}
+        uses: actions/setup-python@v5
+        with:
+          python-version: {% raw %}${{ matrix.python-version }}{% endraw %}
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          version: {% raw %}${{ env.UV_VERSION }}{% endraw %}
+          enable-cache: true
+          cache-suffix: {% raw %}${{ matrix.os }}-${{ matrix.python-version }}-uv_tests-commit{% endraw %}
+      - name: Install tox
+        run: uv tool install --python-preference only-system tox=={% raw %}${{ env.TOX_VERSION }}{% endraw %} --with tox-gh
+      - name: Cache tox env
+        uses: actions/cache@v4
+        with:
+          path: .tox
+          key: {% raw %}${{ matrix.os }}-${{ matrix.python-version }}-tox-${{ hashFiles('pyproject.toml', '.pre-commit-config.yaml') }}{% endraw %}
+      - name: Run tox
+        run: |
+          tox -p
+      {%- if should_upload_coverage_to_codecov %}
+      - name: Set code coverage variable for coverage file / flags
+        run: |
+          MATRIX_PYTHON_VERSION={% raw %}${{matrix.python-version}}{% endraw %}
+          echo "TOX_COVERAGE_ENV=py$(echo ${MATRIX_PYTHON_VERSION} | cut -d . -f -2 | sed -e 's/\.//g')" >> $GITHUB_ENV
+      - name: Upload to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          token: {% raw %}${{ secrets.CODECOV_TOKEN }}{% endraw %}
+          files: ./.tox/.coverage.coverage-{% raw %}${{ env.TOX_COVERAGE_ENV }}{% endraw %}.xml
+          verbose: true
+          fail_ci_if_error: true
+          flags: "{% raw %}${{ env.TOX_COVERAGE_ENV }}{% endraw %}"
+      {%- endif %}

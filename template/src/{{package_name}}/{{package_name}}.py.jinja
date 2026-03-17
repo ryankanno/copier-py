@@ -1,0 +1,24 @@
+#!/usr/bin/env python
+#
+# Copyright © , {{ "%Y" | strftime }}, {{ author_name }} <{{ author_email }}>  # noqa: B950, E501
+#
+# Distributed under terms of the MIT license.
+
+"""Default module for {{ package_name }}."""
+
+import structlog
+
+
+LOGGER = structlog.get_logger(__name__)
+
+
+def hello_world() -> str:
+    return "Hello World"
+
+
+if __name__ == "__main__":
+    print(hello_world())  # noqa: T201
+
+
+# vim: fenc=utf-8
+# vim: filetype=python

@@ -1,0 +1,54 @@
+ci/cd:
+  - changed-files:
+    - any-glob-to-any-file:
+      - '.github/**/*'
+
+dependencies:
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'pyproject.toml'
+
+docker:
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'Dockerfile*'
+      - '.dockerignore'
+      - 'docker-entrypoint.sh'
+
+docs:
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'docs/**/*'
+      - '**/README.*'
+      - 'AUTHORS.*'
+      - 'HISTORY.*'
+
+internal:
+  - changed-files:
+    - any-glob-to-any-file:
+      - '.bandit'
+      - '.commitlint.config.js'
+      - '.konchrc'
+      - '.pre-commit-config.yaml'
+      - '.secrets.baseline'
+      - 'bandit.yaml'
+      - 'tox.ini'
+
+python:
+  - changed-files:
+    - any-glob-to-any-file:
+      - '**/*.py'
+      - 'pyproject.toml'
+
+source:
+  - all:
+    - changed-files:
+      - any-glob-to-any-file:
+        - '{{ package_name }}/**/*'
+      - all-globs-to-all-files:
+        - '!docs/*'
+
+tests:
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'tests/**/*'

@@ -1,0 +1,164 @@
+# ---- Copier settings ----
+_subdirectory: template
+_templates_suffix: ".jinja"
+_min_copier_version: "9.7.1"
+
+_exclude:
+  - "{% if not should_use_direnv %}.envrc{% endif %}"
+  - "{% if not should_create_author_files %}AUTHORS.rst{% endif %}"
+  - "{% if not should_install_github_dependabot %}.github/dependabot.yml{% endif %}"
+  - "{% if not should_automerge_autoapprove_github_dependabot %}.github/workflows/auto-approve-merge-dependabot.yml{% endif %}"
+  - "{% if not should_install_github_actions %}.github{% endif %}"
+
+_tasks:
+  - "git init"
+
+# ---- Questions ----
+author_name:
+  type: str
+  default: "Ryan Kanno"
+  help: "Author's full name"
+
+author_email:
+  type: str
+  default: "ryankanno@localkinegrinds.com"
+  help: "Author's email address"
+
+project_name:
+  type: str
+  help: "Human-readable project name"
+
+project_short_description:
+  type: str
+  default: "This is a short description about {{ project_name }}"
+  help: "One-line project description"
+
+project_url:
+  type: str
+  default: "https://github.com/ryankanno/copier-py"
+  help: "Project URL (GitHub repository)"
+
+project_license:
+  type: str
+  default: "MIT"
+  help: "Project license"
+
+github_repository_owner:
+  type: str
+  default: "ryankanno"
+  help: "GitHub repository owner"
+
+package_name:
+  type: str
+  help: "Python package name (snake_case)"
+  validator: "{% if not package_name | regex_search('^[a-z][a-z0-9_]*$') %}Must be a valid Python identifier (snake_case){% endif %}"
+
+version:
+  type: str
+  default: "0.0.0"
+  help: "Initial project version"
+
+python_version:
+  type: str
+  default: "3.12"
+  help: "Primary Python version"
+
+supported_python_versions:
+  type: str
+  default: "3.10, 3.11, 3.12, 3.13, pypy3.10, pypy3.11"
+  help: "Comma-separated list of supported Python versions"
+  validator: >-
+    {% set allowed = ['3.10', '3.11', '3.12', '3.13', 'pypy3.10', 'pypy3.11'] %}
+    {% for v in supported_python_versions.split(',') %}
+    {% if v.strip() not in allowed %}Invalid Python version: {{ v.strip() }}{% endif %}
+    {% endfor %}
+
+uv_version:
+  type: str
+  default: "0.7.3"
+  help: "uv version"
+
+tox_version:
+  type: str
+  default: "4.25.0"
+  help: "tox version"
+
+sphinx_theme:
+  type: str
+  choices:
+    - furo
+    - sphinx-rtd-theme
+    - sphinx-book-theme
+    - pydata-sphinx-theme
+    - sphinx-press-theme
+    - piccolo-theme
+    - sphinxawesome-theme
+    - sphinx-wagtail-theme
+    - alabaster
+    - agogo
+    - bizstyle
+    - classic
+    - haiku
+    - nature
+    - pyramid
+    - scrolls
+    - sphinxdoc
+    - traditional
+  default: furo
+  help: "Sphinx documentation theme"
+
+should_use_direnv:
+  type: bool
+  default: true
+  help: "Use direnv for environment management?"
+
+should_create_author_files:
+  type: bool
+  default: true
+  help: "Create AUTHORS.rst file?"
+
+should_install_github_dependabot:
+  type: bool
+  default: true
+  help: "Install GitHub Dependabot configuration?"
+
+should_automerge_autoapprove_github_dependabot:
+  type: bool
+  default: true
+  help: "Auto-approve and auto-merge Dependabot PRs?"
+  when: "{{ should_install_github_dependabot and should_install_github_actions }}"
+
+should_install_github_actions:
+  type: bool
+  default: true
+  help: "Install GitHub Actions workflows?"
+
+should_upload_coverage_to_codecov:
+  type: bool
+  default: false
+  help: "Upload coverage to Codecov?"
+  when: "{{ should_install_github_actions }}"
+
+should_publish_to_testpypi:
+  type: bool
+  default: false
+  help: "Publish to TestPyPI?"
+  when: "{{ should_install_github_actions }}"
+
+should_publish_to_pypi:
+  type: bool
+  default: false
+  help: "Publish to PyPI?"
+  when: "{{ should_install_github_actions }}"
+
+should_publish_to_github_packages:
+  type: bool
+  default: false
+  help: "Publish to GitHub Packages?"
+  when: "{{ should_install_github_actions }}"
+
+should_attach_to_github_release:
+  type: bool
+  default: false
+  help: "Attach artifacts to GitHub release?"
+  when: "{{ should_install_github_actions }}"

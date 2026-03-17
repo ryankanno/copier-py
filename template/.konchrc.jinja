@@ -1,0 +1,53 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+import datetime
+import os
+import pprint
+import re
+import sys
+import time
+
+import konch
+
+import {{ package_name }}
+
+# Available options:
+#   'context', 'banner', 'shell', 'prompt',
+#   'hide_context', 'ipy_extensions', 'ipy_autoreload'
+
+banner = '''
+Welcome to the {{ package_name }} shell. Please edit .konchrc file if
+you'd like to add additional dependencies.
+'''
+
+
+konch.config({
+    'banner': banner,
+    'context': {
+        'os': os,
+        'sys': sys,
+        're': re,
+        'time': time,
+        'dt': datetime.datetime,
+        'pp': pprint.pprint,
+        'speak': konch.speak,
+        '{{ package_name }}': {{ package_name }}
+    },
+    'shell': 'ipython',
+    'ipy_autoreload': True,
+    'ipy_extensions': [
+        # Ipython extensions here
+    ]
+})
+
+
+def setup():
+    pass
+
+
+def teardown():
+    pass
+
+
+# vim: filetype=python

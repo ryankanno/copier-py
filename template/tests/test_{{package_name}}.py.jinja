@@ -1,0 +1,18 @@
+#!/usr/bin/env python
+#
+
+"""Tests for `{{ package_name }}` package."""
+
+# fmt: off
+
+from {{ package_name }} import {{ package_name }}  # noqa: E999
+
+
+# fmt: on
+
+
+def test_hello_world() -> None:
+    assert {{ package_name }}.hello_world() == "Hello World"
+
+
+# vim: filetype=python

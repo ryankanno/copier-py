@@ -1,0 +1,205 @@
+[project]
+name = "copier-py"
+version = "0.0.0"
+description = "A copier template for Python projects"
+authors = [{ name = "Ryan Kanno", email = "ryankanno@localkinegrinds.com" }]
+requires-python = ">=3.10,<3.14"
+readme = "README.md"
+license = "MIT"
+maintainers = [{ name = "Ryan Kanno", email = "ryankanno@localkinegrinds.com" }]
+keywords = ["copier", "template", "python"]
+classifiers = ["Programming Language :: Python"]
+dependencies = [
+    "copier>=9.7.1",
+]
+
+[project.urls]
+Repository = "https://github.com/ryankanno/copier-py"
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3.5,<10",
+    "pytest-cov>=6.1.1,<8",
+    "pytest-xdist>=3.6.1,<4",
+    "tox>=4.25.0,<5",
+    "tox-uv>=1.21.5",
+    "mypy>=1.15.0,<2",
+    "ruff>=0.11.7,<0.16",
+    "deptry>=0.23.0,<0.25",
+    "pre-commit-uv>=4.1.4",
+    "pdbp>=1.7.1,<2",
+]
+
+[tool.uv]
+default-groups = [
+    "dev",
+]
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "copier_py",
+    "copier.yml",
+    "template/**/*",
+]
+
+[tool.hatch.build.targets.wheel]
+include = [
+    "copier_py",
+    "copier.yml",
+    "template/**/*",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.mypy]
+python_version = "3.12"
+check_untyped_defs = true
+disallow_any_generics = true
+disallow_incomplete_defs = true
+disallow_subclassing_any = true
+disallow_untyped_calls = true
+disallow_untyped_decorators = true
+disallow_untyped_defs = true
+follow_imports = "normal"
+ignore_missing_imports = true
+no_implicit_optional = true
+no_implicit_reexport = false
+show_error_codes = true
+show_error_context = true
+strict_equality = true
+strict_optional = true
+warn_redundant_casts = true
+warn_return_any = true
+warn_unused_configs = true
+warn_unused_ignores = false
+exclude = [
+    "template/",
+]
+
+[tool.black]
+line-length = 79
+skip-string-normalization = true
+target-version = ['py311', 'py312', 'py313']
+include = '\.pyi?$'
+exclude = '''
+(
+  /(
+     \.ruff_cache
+     | \.direnv
+     | \.eggs
+     | \.git
+     | \.hg
+     | \.mypy_cache
+     | \.nox
+     | \.tox
+     | \.venv
+     | venv
+     | \.svn
+     | _build
+     | buck-out
+     | build
+     | dist
+     | __pypackages__
+     | template
+ )/
+)
+'''
+
+[tool.pytest.ini_options]
+minversion = "7.4"
+addopts = "-n auto"
+testpaths = [
+    "tests",
+]
+norecursedirs = ["template"]
+
+[tool.coverage.run]
+parallel = true
+branch = true
+source = [
+    "copier_py",
+]
+omit = [
+    "*/template/*",
+    "*/python?.?/*",
+    "*/tests/*",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+]
+show_missing = true
+skip_covered = false
+
+[tool.isort]
+force_grid_wrap = 0
+force_single_line = true
+include_trailing_comma = true
+lines_after_imports = 2
+multi_line_output = 3
+use_parentheses = true
+known_third_party = [""]
+default_section = "THIRDPARTY"
+known_first_party = "copier_py"
+sections = "FUTURE,STDLIB,THIRDPARTY,FIRSTPARTY,LOCALFOLDER"
+skip = "tests"
+
+[tool.ruff]
+extend-exclude = ["template"]
+line-length = 79
+
+[tool.ruff.lint.mccabe]
+max-complexity = 10
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.lint]
+preview = true
+select = [
+    "A",    # python builtins being used as variables or parameters
+    "ANN",  # annotations
+    "ARG",  # unused function arguments
+    "B",    # common design problems (flake8-bugbear)
+    "BLE",  # blind exception catching
+    "C4",   # proper comprehensions
+    "C9",   # mccabe complexity
+    "D",    # docstring conventions (pydocstyle)
+    "D417", # missing args in docstrings
+    "DTZ",  # unsafe naive datetime use (flake8-datetimez)
+    "E",    # code style conventions (pycodestyle)
+    "EM",   # raw literals inside exception (flake8-errmsg)
+    "F",    # python source code for errors (pyflakes)
+    "FIX",  # temporary developer notes (flake8-fixme)
+    "FURB", # code improvements (refurb)
+    "G",    # logging string formatting (flake8-logging-format)
+    "LOG",  # logging module usage (flake8-logging)
+    "PERF", # performance anti-patterns (perflint)
+    "PGH",  # pygrep hooks
+    "PIE",  # misc (flake8-pie)
+    "PL",   # code errors and smells (pylint)
+    "PT",   # common pytest issues
+    "PTH",  # pathlib usage
+    "RET",  # return statements (flake8-return)
+    "RSE",  # exception raise statements (flake8-raise)
+    "S",    # security testing (flake8-bandit)
+    "SIM",  # code simplicity (flake8-simplify)
+    "T20",  # for any print statements
+    "TRY",  # exception handling anti-patterns (tryceratops)
+    "UP",   # outdated syntax (pyupgrade)
+    "W",    # code style conventions (pycodestyle)
+]
+ignore = [
+    "D100",
+    "D103",
+    "D104",
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/test_*.py" = ["S101"]

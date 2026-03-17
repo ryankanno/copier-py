@@ -1,0 +1,72 @@
+name: docs
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+  # manual
+  workflow_dispatch:
+
+env:
+  UV_VERSION: {{ uv_version }}
+  TOX_VERSION: {{ tox_version }}
+  PRE_COMMIT_CACHE: ~/.cache/pre-commit
+
+jobs:
+  tox-docs:
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version:
+          - "3.11"
+        os: [ubuntu-latest]
+        env:
+          - TOXENV: "docs"
+    runs-on: {% raw %}${{ matrix.os }}{% endraw %}
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure Python {% raw %}${{ matrix.python-version }}{% endraw %}
+        uses: actions/setup-python@v5
+        with:
+          python-version: {% raw %}${{ matrix.python-version }}{% endraw %}
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          version: {% raw %}${{ env.UV_VERSION }}{% endraw %}
+          enable-cache: true
+          cache-suffix: {% raw %}${{ matrix.os }}-${{ matrix.python-version }}-uv_pre-docs{% endraw %}
+      - name: Install tox
+        run: uv tool install --python-preference only-system tox=={% raw %}${{ env.TOX_VERSION }}{% endraw %} --with tox-gh
+      - name: Cache pre-commit
+        uses: actions/cache@v4
+        with:
+          path: {% raw %}${{ env.PRE_COMMIT_CACHE }}{% endraw %}
+          key: {% raw %}${{ matrix.os }}-${{ matrix.python-version }}-pre-commit-${{ hashFiles('.pre-commit-config.yaml') }}{% endraw %}
+      - name: Run tox
+        run: |
+          tox
+        shell: bash
+        env: {% raw %}${{ matrix.env }}{% endraw %}
+      - name: Prepare docs artifact
+        if: always()
+        shell: bash
+        run: |
+          mkdir artifact
+          cp -a .tox/docs_out/ artifact/html_docs
+      - name: Upload docs artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: html_docs
+          path: ./artifact
+      - name: Deploy to gh pages
+        if: {% raw %}${{ github.event_name == 'push' && github.ref_name ==  github.event.repository.default_branch }}{% endraw %}
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: {% raw %}${{ secrets.GITHUB_TOKEN }}{% endraw %}
+          publish_dir: .tox/docs_out/
+          destination_dir: ./latest

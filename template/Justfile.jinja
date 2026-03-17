@@ -1,0 +1,83 @@
+#!/usr/bin/env just --justfile
+
+set quiet
+
+runner_cmd := 'uv'
+
+[private]
+default:
+    just --list
+
+# Remove build artifacts (build, dist, .egg)
+[private]
+clean-build:
+    rm -fr build/
+    rm -fr dist/
+    rm -fr .eggs/
+    find . -name '*.egg-info' -exec rm -fr {} +
+    find . -name '*.egg' -exec rm -fr {} +
+
+# Remove Python artifacts (.pyc, .pyo, __pycache__)
+[private]
+clean-pyc:
+    find . -name '*.pyc' -exec rm -f {} +
+    find . -name '*.pyo' -exec rm -f {} +
+    find . -name '*~' -exec rm -f {} +
+    find . -name '__pycache__' -exec rm -fr {} +
+
+# Remove test artifacts (.tox, .coverage, coveragexml)
+[private]
+clean-test:
+    rm -fr .tox/
+    rm -f .coverage
+    rm -f coverage.xml
+    rm -fr htmlcov/
+
+# Remove docs
+[private]
+clean-docs:
+    rm -fr .tox/docsout
+
+# Remove build, Python, test artifacts, and docs
+clean: clean-docs clean-build clean-pyc clean-test
+
+# Check code coverage with current Python
+coverage:
+    just tox run-parallel -m coverage
+
+# Generate Sphinx documentation (tox:docs)
+[no-quiet]
+docs: clean-docs
+    just tox run -e docs
+
+# Package
+dist: clean
+    {% raw %}{{runner_cmd}}{% endraw %} build
+
+# Install package to current Python's site-package
+install: clean
+    {% raw %}{{runner_cmd}}{% endraw %} sync
+
+# Lint (tox:lint) - use --fix to auto-fix issues
+lint *LINT_ARGS:
+    @if [[ "{% raw %}{{LINT_ARGS}}{% endraw %}" == "--fix" ]]; then \
+        just tox run -e lint-fix; \
+    else \
+        just tox run -e lint {% raw %}{{LINT_ARGS}}{% endraw %}; \
+    fi
+
+# Runs tests (tox:tests)
+tests *TESTS_ARGS:
+    just tox run-parallel -m tests {% raw %}{{TESTS_ARGS}}{% endraw %}
+
+# Runs pre-commit (tox:pre-commit)
+pre-commit:
+    just tox run -e pre-commit
+
+# Runs tox
+tox *TOX_ARGS:
+    {% raw %}{{runner_cmd}}{% endraw %} run tox {% raw %}{{TOX_ARGS}}{% endraw %}
+
+# Runs watchexec
+watch *JUST_RECIPE:
+    watchexec -r -e py -- "just {% raw %}{{JUST_RECIPE}}{% endraw %} && toastify send '🚀 just {% raw %}{{JUST_RECIPE}}{% endraw %}' 'just {% raw %}{{JUST_RECIPE}}{% endraw %} was successful' --icon info || toastify send '❌ just {% raw %}{{JUST_RECIPE}}{% endraw %}' 'just {% raw %}{{JUST_RECIPE}}{% endraw %} failed' --icon error"
