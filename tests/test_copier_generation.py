@@ -50,7 +50,6 @@ EXPECTED_BASE_BAKED_FILES = [
     'pyproject.toml',
     'tox.ini',
     '_typos.toml',
-    '.copier-answers.yml',
 ]
 
 EXPECTED_BAKED_DIRENV_FILES = ['.envrc']
@@ -98,15 +97,18 @@ def get_expected_baked_files(package_name: str) -> list[str]:
 
 def build_files_list(root_dir: str, is_absolute: bool = True) -> list[str]:
     """Build a list containing abs/relative paths to the generated files."""
-    return [
-        (
-            str(Path(dirpath) / file_path)
-            if is_absolute
-            else str(Path(dirpath[len(root_dir) :]) / file_path)
-        )
-        for dirpath, subdirs, files in os.walk(root_dir)
-        for file_path in files
-    ]
+    result = []
+    for dirpath, subdirs, files in os.walk(root_dir):
+        # Skip .git directory
+        subdirs[:] = [d for d in subdirs if d != '.git']
+        for file_path in files:
+            if is_absolute:
+                result.append(str(Path(dirpath) / file_path))
+            else:
+                result.append(
+                    str(Path(dirpath[len(root_dir) :]) / file_path)
+                )
+    return result
 
 
 def check_paths_substitution(paths: list[str]) -> None:

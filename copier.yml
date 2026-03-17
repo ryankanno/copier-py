@@ -7,8 +7,11 @@ _exclude:
   - "{% if not should_use_direnv %}.envrc{% endif %}"
   - "{% if not should_create_author_files %}AUTHORS.rst{% endif %}"
   - "{% if not should_install_github_dependabot %}.github/dependabot.yml{% endif %}"
+  - "{% if not should_install_github_dependabot or not should_install_github_actions %}.github/workflows/auto-approve-merge-dependabot.yml{% endif %}"
   - "{% if not should_automerge_autoapprove_github_dependabot %}.github/workflows/auto-approve-merge-dependabot.yml{% endif %}"
-  - "{% if not should_install_github_actions %}.github{% endif %}"
+  - "{% if not should_install_github_actions %}.github/labeler.yml{% endif %}"
+  - "{% if not should_install_github_actions %}.github/release-drafter.yml{% endif %}"
+  - "{% if not should_install_github_actions %}.github/workflows{% endif %}"
 
 _tasks:
   - "git init"
