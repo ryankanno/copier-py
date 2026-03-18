@@ -1,0 +1,72 @@
+name: docs
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+  # manual
+  workflow_dispatch:
+
+env:
+  UV_VERSION: 0.7.3
+  TOX_VERSION: 4.25.0
+  PRE_COMMIT_CACHE: ~/.cache/pre-commit
+
+jobs:
+  tox-docs:
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version:
+          - "3.11"
+        os: [ubuntu-latest]
+        env:
+          - TOXENV: "docs"
+    runs-on: ${{ matrix.os }}
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v6
+      - name: Configure Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          version: ${{ env.UV_VERSION }}
+          enable-cache: true
+          cache-suffix: ${{ matrix.os }}-${{ matrix.python-version }}-uv_docs
+      - name: Install tox
+        run: uv tool install --python-preference only-system tox==${{ env.TOX_VERSION }} --with tox-gh
+      - name: Cache pre-commit
+        uses: actions/cache@v5
+        with:
+          path: ${{ env.PRE_COMMIT_CACHE }}
+          key: ${{ matrix.os }}-${{ matrix.python-version }}-pre-commit-${{ hashFiles('.pre-commit-config.yaml') }}
+      - name: Run tox
+        run: |
+          tox
+        shell: bash
+        env: ${{ matrix.env }}
+      - name: Prepare docs artifact
+        if: always()
+        shell: bash
+        run: |
+          mkdir artifact
+          cp -a .tox/docs_out/ artifact/html_docs
+      - name: Upload docs artifact
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: html_docs
+          path: ./artifact
+      - name: Deploy to gh pages
+        if: ${{ github.event_name == 'push' && github.ref_name ==  github.event.repository.default_branch }}
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: .tox/docs_out/
+          destination_dir: ./latest
