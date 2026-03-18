@@ -3,7 +3,7 @@ name = "copier-py"
 version = "0.0.0"
 description = "A copier template for Python projects"
 authors = [{ name = "Ryan Kanno", email = "ryankanno@localkinegrinds.com" }]
-requires-python = ">=3.10,<3.14"
+requires-python = ">=3.11,<3.14"
 readme = "README.md"
 license = "MIT"
 maintainers = [{ name = "Ryan Kanno", email = "ryankanno@localkinegrinds.com" }]

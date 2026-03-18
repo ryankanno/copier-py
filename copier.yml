@@ -68,10 +68,10 @@ python_version:
 
 supported_python_versions:
   type: str
-  default: "3.10, 3.11, 3.12, 3.13, pypy3.10, pypy3.11"
+  default: "3.11, 3.12, 3.13, pypy3.11"
   help: "Comma-separated list of supported Python versions"
   validator: >-
-    {% set allowed = ['3.10', '3.11', '3.12', '3.13', 'pypy3.10', 'pypy3.11'] %}
+    {% set allowed = ['3.11', '3.12', '3.13', 'pypy3.11'] %}
     {% for v in supported_python_versions.split(',') %}
     {% if v.strip() not in allowed %}Invalid Python version: {{ v.strip() }}{% endif %}
     {% endfor %}
