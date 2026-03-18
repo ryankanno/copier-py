@@ -9,7 +9,9 @@
       "Bash(~/scripts/github-create-repo.sh copier-py:*)",
       "Bash(gh repo:*)",
       "Bash(git remote:*)",
-      "Bash(python3:*)"
+      "Bash(python3:*)",
+      "Bash(grep:*)",
+      "Bash(sed:*)"
     ]
   }
 }
