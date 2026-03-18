@@ -591,7 +591,7 @@ def test_with_version(
                 Path(path).open('rb', 0) as file,
                 mmap.mmap(file.fileno(), 0, access=mmap.ACCESS_READ) as s,
             ):
-                if s.find(f'version = "{version}"'.encode()) == -1:
+                if s.find(f"version = '{version}'".encode()) == -1:
                     pytest.fail(
                         'pyproject.toml should have appropriate version'
                     )

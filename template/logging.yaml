@@ -2,8 +2,8 @@ version: 1
 disable_existing_loggers: False
 formatters:
   simple:
-    "()": structlog.stdlib.ProcessorFormatter
-    "processor": structlog.dev.ConsoleRenderer(colors=False)
+    "()": structlog.stdlib.ProcessorFormatter,
+    "processor": structlog.dev.ConsoleRenderer(colors=False),
 handlers:
   console:
     class: logging.StreamHandler

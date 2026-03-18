@@ -1,3 +1,5 @@
+# https://github.com/CodelyTV/pr-size-labeler
+
 name: pr-size-labeler
 
 on: [pull_request]

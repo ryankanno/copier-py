@@ -1,3 +1,6 @@
+# validate either actual commits or pr title
+# src: https://raw.githubusercontent.com/patternfly/patternfly-elements/24dd236afbbc90045165fd33ddaf036e56e26cd7/.github/workflows/commitlint.yml
+
 name: commitlint
 
 on:
