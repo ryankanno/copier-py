@@ -1,0 +1,36 @@
+version: 2
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    assignees:
+      - "ryankanno"
+    commit-message:
+      prefix: "build(github)"
+    groups:
+      gha:
+        update-types:
+          - "major"
+          - "minor"
+          - "patch"
+    labels:
+      - "github-actions"
+
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    assignees:
+      - "ryankanno"
+    commit-message:
+      prefix: "build"
+      include: "scope"
+    groups:
+      dev:
+        dependency-type: "development"
+    open-pull-requests-limit: 10
+    labels:
+      - "automerge"
+      - "pip"
+      - "dependencies"
