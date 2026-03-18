@@ -49,6 +49,3 @@ docs/sources/
 
 # direnv
 .direnv/
-
-# uv
-uv.lock
