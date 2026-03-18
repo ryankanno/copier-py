@@ -1,57 +1,265 @@
-# copier-py
+<h3 align="center">copier-py</h3>
 
-A [copier](https://github.com/copier-org/copier) template for modern Python projects.
+<div align="center">
+  <p>🐍 Modern Python project copier template</p>
+</div>
 
-Equivalent to [cookiecutter-py](https://github.com/ryankanno/cookiecutter-py) but uses copier instead of cookiecutter.
+<div align="center">
 
-## Usage
+[![Python 3.10-3.13](https://img.shields.io/badge/python-3.10%20|%203.11%20|%203.12%20|%203.13-blue.svg)](https://www.python.org/downloads/)
+[![GitHub Issues][github-issues-shield]][github-issues-url]
+[![GitHub Pull Requests][github-prs-shield]][github-prs-url]
+[![License][project-license-shield]][project-license-url]
 
-```bash
+</div>
+
+---
+
+Each time you start a new Python project, you shouldn't start from scratch.
+Ideally, you'd start with a standard project structure and set of tools and
+integrations to help facilitate writing quality Python code.
+
+This modern Python [copier](https://github.com/copier-org/copier) template
+is the tool that will help you do just that. It is the copier equivalent of
+[cookiecutter-py](https://github.com/ryankanno/cookiecutter-py).
+
+---
+
+<!-- FEATURES -->
+## ✨ Features
+
+- [`uv`](https://github.com/astral-sh/uv) to manage dependencies
+- [`structlog`](https://www.structlog.org/en/stable) for logging
+- [`mypy`](https://mypy-lang.org) for static typing
+- [`pytest`](https://github.com/pytest-dev/pytest), [`hypothesis`](https://github.com/HypothesisWorks/hypothesis), [`mutmut`](https://github.com/boxed/mutmut) for testing
+
+  - [`pytest-cov`](https://pytest-cov.readthedocs.io/en/latest/) for coverage reports
+  - [`pytest-mock`](https://github.com/pytest-dev/pytest-mock/) for mocks
+  - [`pytest-xdist`](https://github.com/pytest-dev/pytest-xdist) for distributed testing
+  - [`pytest-randomly`](https://github.com/pytest-dev/pytest-randomly) to randomly order tests
+
+- [`tox`](https://tox.readthedocs.org/en/latest/) for testing automation
+- [`sphinx`](http://www.sphinx-doc.org/en/master/) for docs
+  - [`myst-parser`](https://github.com/executablebooks/MyST-Parser) for markdown docs
+  - selectable theme
+- [`pdbp`](https://github.com/mdmintz/pdbp) for debugging
+- [`konch`](http://konch.readthedocs.org/en/latest/) for shell configuration w/ [`ipython`](https://ipython.org) support
+- [`pre-commit`](https://pre-commit.com) hooks with comprehensive tooling:
+  - [`uv-lock`](https://github.com/astral-sh/uv-pre-commit) for dependency management
+  - [`mypy`](https://mypy-lang.org) for type checking
+  - [`ruff`](https://github.com/astral-sh/ruff) for linting and formatting
+  - [`black`](https://github.com/psf/black) for code formatting
+  - [`blacken-docs`](https://github.com/adamchainz/blacken-docs) for formatting code in docs
+  - [`isort`](https://github.com/pycqa/isort) for import sorting
+  - [`bashate`](https://github.com/openstack/bashate) for shell script linting
+  - [`commitlint`](https://github.com/conventional-changelog/commitlint) for commit message standards
+  - [`detect-secrets`](https://github.com/Yelp/detect-secrets) for secret detection
+  - [`typos`](https://github.com/crate-ci/typos) for spell checking
+  - [`deptry`](https://github.com/fpgmaas/deptry) for dependency validation
+- [`dockerfile`](https://www.docker.com/) for development, testing, and production
+- [`dunamai`](https://github.com/mtkennerly/dunamai) for versioning
+- custom [`Justfile`](https://github.com/casey/just) (run `just`)
+- stay up-to-date w/ configured [`dependabot`](https://dependabot.com/)
+- [`github-actions`](https://github.com/features/actions) with ci, publish to pypi workflows w/ [`release-drafter`](https://github.com/release-drafter/release-drafter) integration
+
+  - `ci` workflow (leveraging [`tox`](https://tox.readthedocs.org/en/latest/))
+
+    - optional [`codecov`](https://codecov.io) integration for code coverage
+
+  - `publish` workflow with configurable publishing to:
+    - [TestPyPI](https://test.pypi.org) (optional, disabled by default)
+    - [PyPI](https://pypi.org) (optional, disabled by default)
+    - [GitHub Packages](https://docs.github.com/en/packages) (optional, disabled by default)
+    - GitHub Release artifacts (optional, disabled by default)
+    - Always builds and uploads artifacts to GitHub Actions for manual inspection
+    - Integrated with [`release-drafter`](https://github.com/release-drafter/release-drafter)
+  - `auto approve / merge` workflow
+  - with these additional workflows:
+
+    - `codeql` for security analysis
+    - `hadolint` for Dockerfile linting
+    - `pr-size-labeling` for PR size classification
+    - `pr-labeler` for automated PR labeling
+    - `commitlint` for commit message validation
+    - `trufflehog` for secret scanning
+    - `docs` for documentation publishing
+    - `release-drafter` for automated release notes
+- optional [`direnv`](https://github.com/direnv/direnv) .envrc (with [`use uv`](https://raw.githubusercontent.com/ryankanno/dotfiles/5ed45cfd8c387489fc0459eb1a485b2c21f3d159/dot_config/direnv/direnvrc) layout)
+- built-in template updates via `copier update`
+
+<!-- GETTING STARTED -->
+## 🚀 Getting Started
+
+### Prerequisites
+
+Install [copier](https://copier.readthedocs.io/en/latest/)
+
+```sh
+uv tool install copier
+# pip install copier
+# pipx install copier
+```
+
+## 🛠️ Usage
+
+### Copier
+
+```sh
 copier copy gh:ryankanno/copier-py /path/to/destination
 ```
 
-Or with [uv](https://docs.astral.sh/uv/):
+Or with [uv](https://docs.astral.sh/uv/) (no install needed):
 
-```bash
+```sh
 uvx copier copy gh:ryankanno/copier-py /path/to/destination
 ```
 
-## Features
+Add `--trust` to allow the post-generation `git init` task to run automatically.
 
-- [uv](https://github.com/astral-sh/uv) for dependency management
-- [structlog](https://www.structlog.org/) for logging
-- [mypy](https://mypy.readthedocs.io/) for static type checking
-- [pytest](https://docs.pytest.org/) with hypothesis and mutmut
-- [tox](https://tox.readthedocs.io/) for multi-version testing
-- [Sphinx](https://www.sphinx-doc.org/) documentation (17 theme choices)
-- [pdbp](https://github.com/mdmintz/pdbp) for debugging
-- [konch](https://konch.readthedocs.io/) for interactive shell
-- [pre-commit](https://pre-commit.com/) hooks (mypy, ruff, black, isort, commitlint, detect-secrets, typos, deptry)
-- [Dockerfile](https://docs.docker.com/) with multi-stage builds
-- [dunamai](https://github.com/mtkennerly/dunamai) for semantic versioning
-- [Justfile](https://just.systems/) task runner
-- [Dependabot](https://docs.github.com/en/code-security/dependabot) integration
-- GitHub Actions (ci, publish, codeql, docs, hadolint, pr-labeler, pr-size-labeler, commitlint, trufflehog, release-drafter)
-- Optional direnv support
+**Note**: If you want to use the auto approve / merge Dependabot workflow, make
+sure to create tags `major`, `minor`, `patch` so that Dependabot can tag its
+PRs. The workflow won't merge anything with a `major` tag.
 
-## Template Variables
-
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `project_name` | — | Human-readable project name |
-| `package_name` | — | Python package name (snake_case) |
-| `project_short_description` | — | One-line description |
-| `author_name` | Ryan Kanno | Author's full name |
-| `author_email` | ryankanno@localkinegrinds.com | Author's email |
-| `project_url` | — | GitHub repository URL |
-| `python_version` | 3.12 | Primary Python version |
-| `sphinx_theme` | furo | Sphinx documentation theme |
-| And more... | | See `copier.yml` for full list |
-
-## Updating Projects
+### Updating Projects
 
 Projects created with this template can be updated when the template evolves:
 
-```bash
+```sh
 copier update /path/to/project
 ```
+
+<!-- DETAILS -->
+## 🔍 Details
+
+### Justfile Commands
+
+The template includes a comprehensive [`Justfile`](https://github.com/casey/just) with the following commands:
+
+**Development:**
+- **`just install`** - Install dependencies using uv
+- **`just clean`** - Remove all build, test, and documentation artifacts
+
+**Testing & Quality:**
+- **`just tests`** - Run all tests (fast, no coverage)
+- **`just tests -- path/to/test.py`** - Run specific tests
+- **`just tests -- --durations=10`** - Show slow test durations
+- **`just coverage`** - Run tests with comprehensive coverage analysis
+- **`just lint`** - Run all linting checks via tox
+- **`just lint --fix`** - Auto-fix linting issues where possible
+- **`just pre-commit`** - Run pre-commit hooks
+
+**Documentation & Distribution:**
+- **`just docs`** - Build Sphinx documentation
+- **`just dist`** - Build distribution packages
+
+**Utilities:**
+- **`just tox -- <args>`** - Run tox with custom arguments
+- **`just watch <recipe>`** - Watch files and re-run commands on changes (with desktop notifications)
+
+All commands use `uv` as the package manager and integrate with tox environments for consistency.
+
+### Docker
+
+To build the container:
+
+```sh
+DOCKER_BUILDKIT=1 docker build .
+```
+
+To run the container (if you've installed the defaults):
+
+```sh
+docker run <image_id or tag> python -m foobar.foobar
+```
+
+### Versioning
+
+If you enable the PyPI workflow, versioning will happen via [`dunamai`](https://github.com/mtkennerly/dunamai) within the GitHub pipeline.
+
+If instead, you prefer to version your package, please do it via `uv version $(dunamai from any)` as recommended in their [documentation](https://github.com/mtkennerly/dunamai#user-content-integration).
+
+### Configuration Variables
+
+When you run copier, you'll be prompted for various configuration options. Here are the key variables:
+
+**Project Information:**
+- `author_name` - Your full name
+- `author_email` - Your email address
+- `project_name` - Human-readable project name
+- `project_short_description` - Brief description of your project
+- `project_url` - Project repository URL
+- `project_license` - License type (default: MIT)
+- `github_repository_owner` - GitHub username or organization
+- `package_name` - Python package name (snake_case)
+- `version` - Initial version number (default: 0.0.0)
+
+**Python & Dependencies:**
+- `python_version` - Minimum Python version (default: 3.12)
+- `supported_python_versions` - Comma-separated list of supported versions
+- `uv_version` - Version of uv to use
+- `tox_version` - Version of tox to use
+- `sphinx_theme` - Documentation theme (select from multiple options)
+
+**Optional Features:**
+- `should_use_direnv` - Include .envrc for direnv (default: true)
+- `should_create_author_files` - Include AUTHORS.rst (default: true)
+- `should_install_github_dependabot` - Enable Dependabot (default: true)
+- `should_automerge_autoapprove_github_dependabot` - Auto-approve/merge Dependabot PRs (default: true)
+- `should_install_github_actions` - Include GitHub Actions workflows (default: true)
+- `should_upload_coverage_to_codecov` - Upload coverage to Codecov (default: false)
+
+**Publishing Options:**
+- `should_publish_to_testpypi` - Publish to TestPyPI on every main push (default: false)
+- `should_publish_to_pypi` - Publish to PyPI on release (default: false)
+- `should_publish_to_github_packages` - Publish to GitHub Packages on release (default: false)
+- `should_attach_to_github_release` - Attach build artifacts to GitHub releases (default: false)
+
+**Note:** Even if all publishing options are disabled, the build job still runs and uploads artifacts to GitHub Actions for manual inspection.
+
+<!-- ROADMAP -->
+## 🚧 Roadmap
+
+See the [open issues](https://github.com/ryankanno/copier-py/issues) for a list of proposed features (and known issues).
+
+<!-- TODO -->
+## ☑️ TODO
+
+- [ ] add mutmut example to template
+- [ ] add hypothesis example to template
+- [ ] add licenses
+- [ ] add typeguard
+- [ ] version releases
+- [ ] update docs
+
+<!-- CONTRIBUTING -->
+## 🤝 Contributing
+
+Contributions are very much appreciated.
+
+1. Fork the project
+2. Create your feature branch (`git checkout -b feature/new-copier-feature`)
+3. Commit your changes (`git commit -m 'Added a new feature'`)
+4. Push to the feature branch (`git push origin feature/new-copier-feature`)
+5. Open a PR! 🎆
+
+<!-- LICENSE -->
+## 📝 License
+
+Distributed under the MIT License. See [`LICENSE`](https://github.com/ryankanno/copier-py/blob/main/LICENSE) for more information.
+
+<!-- CONTACT -->
+## 📫 Contact
+
+Ryan Kanno - [@ryankanno][twitter-ryankanno-url]
+
+Project Link: [https://github.com/ryankanno/copier-py][project-url]
+
+
+[project-url]: https://github.com/ryankanno/copier-py
+[project-license-shield]: https://img.shields.io/github/license/ryankanno/copier-py
+[project-license-url]: https://github.com/ryankanno/copier-py/blob/main/LICENSE
+[github-issues-shield]: https://img.shields.io/github/issues/ryankanno/copier-py
+[github-issues-url]: https://github.com/ryankanno/copier-py/issues
+[github-prs-shield]: https://img.shields.io/github/issues-pr/ryankanno/copier-py
+[github-prs-url]: https://github.com/ryankanno/copier-py/pulls
+[twitter-ryankanno-url]: https://twitter.com/ryankanno
