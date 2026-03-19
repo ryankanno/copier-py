@@ -12,7 +12,8 @@
       "Bash(python3:*)",
       "Bash(grep:*)",
       "Bash(sed:*)",
-      "Bash(chmod:*)"
+      "Bash(chmod:*)",
+      "Bash(git commit:*)"
     ]
   }
 }

@@ -203,3 +203,6 @@ ignore = [
 
 [tool.ruff.lint.per-file-ignores]
 "tests/test_*.py" = ["S101"]
+
+[tool.deptry.per_rule_ignores]
+DEP002 = ["copier"]

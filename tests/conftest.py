@@ -17,13 +17,17 @@ TEMPLATE_DIR = str(Path(__file__).parent.parent)
 
 
 @pytest.fixture
-def default_context(request: SubRequest) -> dict[str, object]:  # noqa: ARG001
+def default_context(
+    request: SubRequest,  # noqa: ARG001
+) -> dict[str, str | bool]:
     """Creates default prompt vals."""
     return {
         "author_name": "Ryan Kanno",
         "author_email": "ryankanno@localkinegrinds.com",
         "project_name": "Everybody go surf",
-        "project_short_description": "This is a short description about Everybody go surf",
+        "project_short_description": (
+            "This is a short description about Everybody go surf"
+        ),
         "project_url": "https://github.com/ryankanno/copier-py",
         "project_license": "MIT",
         "github_repository_owner": "ryankanno",
@@ -48,7 +52,9 @@ def default_context(request: SubRequest) -> dict[str, object]:  # noqa: ARG001
 
 
 @pytest.fixture(params=list(product([True, False], repeat=6)))
-def context(request: SubRequest) -> dict[str, object]:
+def context(
+    request: SubRequest,
+) -> dict[str, str | bool]:
     """Parametrized context with all boolean combinations."""
     should_create_author_files = request.param[0]
     should_install_github_dependabot = request.param[1]
@@ -74,7 +80,9 @@ def context(request: SubRequest) -> dict[str, object]:
         "sphinx_theme": "furo",
         "should_use_direnv": should_use_direnv,
         "should_create_author_files": should_create_author_files,
-        "should_install_github_dependabot": should_install_github_dependabot,
+        "should_install_github_dependabot": (
+            should_install_github_dependabot
+        ),
         "should_automerge_autoapprove_github_dependabot": (
             should_automerge_autoapprove_github_dependabot
             and should_install_github_dependabot
