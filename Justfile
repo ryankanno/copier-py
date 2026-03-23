@@ -33,12 +33,30 @@ clean-test:
     rm -f coverage.xml
     rm -fr htmlcov/
 
-# Remove build, Python, test artifacts
-clean: clean-build clean-pyc clean-test
+# Remove docs
+[private]
+clean-docs:
+    rm -fr .tox/docsout
+
+# Remove build, Python, test artifacts, and docs
+clean: clean-docs clean-build clean-pyc clean-test
 
 # Check code coverage with current Python
 coverage:
     just tox run-parallel -m coverage
+
+# Generate Sphinx documentation (tox:docs)
+[no-quiet]
+docs: clean-docs
+    just tox run -e docs
+
+# Package
+dist: clean
+    {{runner_cmd}} build
+
+# Install package to current Python's site-package
+install: clean
+    {{runner_cmd}} sync
 
 # Lint (tox:lint) - use --fix to auto-fix issues
 lint *LINT_ARGS:
