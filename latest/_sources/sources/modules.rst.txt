@@ -1,0 +1,7 @@
+copier_py
+=========
+
+.. toctree::
+   :maxdepth: 4
+
+   copier_py

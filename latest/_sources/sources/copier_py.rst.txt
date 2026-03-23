@@ -1,0 +1,10 @@
+copier\_py package
+==================
+
+Module contents
+---------------
+
+.. automodule:: copier_py
+   :members:
+   :show-inheritance:
+   :undoc-members:
