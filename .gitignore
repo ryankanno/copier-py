@@ -49,3 +49,6 @@ docs/sources/
 
 # direnv
 .direnv/
+
+# ai
+.claude/
