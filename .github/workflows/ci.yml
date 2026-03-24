@@ -86,7 +86,7 @@ jobs:
         run: |
           MATRIX_PYTHON_VERSION=${{matrix.python-version}}
           if [[ "$MATRIX_PYTHON_VERSION" == pypy* ]]; then
-            echo "TOX_COVERAGE_ENV=$(echo ${MATRIX_PYTHON_VERSION} | sed -e 's/\.//g')" >> $GITHUB_ENV
+            echo "TOX_COVERAGE_ENV=$(echo ${MATRIX_PYTHON_VERSION} | sed -e 's/[.\-]//g')" >> $GITHUB_ENV
           else
             echo "TOX_COVERAGE_ENV=py$(echo ${MATRIX_PYTHON_VERSION} | cut -d . -f -2 | sed -e 's/\.//g')" >> $GITHUB_ENV
           fi
