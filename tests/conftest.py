@@ -80,9 +80,7 @@ def context(
         "sphinx_theme": "furo",
         "should_use_direnv": should_use_direnv,
         "should_create_author_files": should_create_author_files,
-        "should_install_github_dependabot": (
-            should_install_github_dependabot
-        ),
+        "should_install_github_dependabot": (should_install_github_dependabot),
         "should_automerge_autoapprove_github_dependabot": (
             should_automerge_autoapprove_github_dependabot
             and should_install_github_dependabot

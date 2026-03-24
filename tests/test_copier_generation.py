@@ -609,9 +609,7 @@ def test_justfile_lint_command_structure(
                 pytest.fail(msg)
 
             if b'if [[ "{{LINT_ARGS}}" == "--fix" ]]' not in content:
-                pytest.fail(
-                    "Justfile lint recipe should check for --fix flag"
-                )
+                pytest.fail("Justfile lint recipe should check for --fix flag")
 
             if b"just tox run -e lint-fix" not in content:
                 msg = "Justfile should call tox lint-fix "
@@ -619,9 +617,7 @@ def test_justfile_lint_command_structure(
                 pytest.fail(msg)
 
             if b"just tox run -e lint {{LINT_ARGS}}" not in content:
-                pytest.fail(
-                    "Justfile should call tox lint env by default"
-                )
+                pytest.fail("Justfile should call tox lint env by default")
 
 
 def test_pyproject_with_default_configuration(

@@ -3,17 +3,17 @@
 # For the full list of built-in configuration values, see the documentation:
 # https://www.sphinx-doc.org/en/master/usage/configuration.html
 
-import os
 import sys
+from pathlib import Path
 
 
-sys.path.insert(0, os.path.abspath('../copier_py/'))
+sys.path.insert(0, str(Path('../copier_py/').resolve()))
 
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
 project = 'copier-py'
-copyright = '2026, Ryan Kanno'
+project_copyright = '2026, Ryan Kanno'
 author = 'Ryan Kanno'
 
 # -- General configuration ---------------------------------------------------
