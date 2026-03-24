@@ -38,7 +38,7 @@ docs = [
 ]
 
 [tool.uv]
-exclude-newer = "1 week"
+exclude-newer = "2 weeks"
 default-groups = [
     "dev",
     "docs",
