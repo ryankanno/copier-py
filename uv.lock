@@ -3,7 +3,7 @@ revision = 3
 requires-python = ">=3.11, <3.14"
 
 [options]
-exclude-newer = "2026-03-10T18:32:22.530226Z"
+exclude-newer = "2026-03-30T04:31:55.540925Z"
 exclude-newer-span = "P2W"
 
 [[package]]
@@ -271,7 +271,7 @@ requires-dist = [{ name = "copier", specifier = ">=9.7.1" }]
 [package.metadata.requires-dev]
 dev = [
     { name = "binaryornot", specifier = ">=0.4.4,<0.5" },
-    { name = "deptry", specifier = ">=0.23.0,<0.25" },
+    { name = "deptry", specifier = ">=0.23.0,<0.26" },
     { name = "mypy", specifier = ">=1.15.0,<2" },
     { name = "pdbp", specifier = ">=1.7.1,<2" },
     { name = "pre-commit-uv", specifier = ">=4.1.4" },
