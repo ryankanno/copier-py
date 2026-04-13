@@ -20,9 +20,8 @@ envlist =
 {%- endfor %}
     pre-commit,
 labels =
-    tests = {%- for python_version in supported_python_versions.split(',') %}{% if python_version.strip().startswith('pypy') %}{{ python_version|trim|replace('.','') }},{% else %}py{{ python_version|trim|replace('.','') }},{% endif %}{%- endfor %}
-
-    coverage = {%- for python_version in supported_python_versions.split(',') %}{% if python_version.strip().startswith('pypy') %}coverage-{{ python_version|trim|replace('.','') }},{% else %}coverage-py{{ python_version|trim|replace('.','') }},{% endif %}{%- endfor %}
+    tests ={%- for python_version in supported_python_versions.split(',') %} {% if python_version.strip().startswith('pypy') %}{{ python_version|trim|replace('.','') }}{% else %}py{{ python_version|trim|replace('.','') }}{% endif %},{%- endfor %}
+    coverage ={%- for python_version in supported_python_versions.split(',') %} coverage-{% if python_version.strip().startswith('pypy') %}{{ python_version|trim|replace('.','') }}{% else %}py{{ python_version|trim|replace('.','') }}{% endif %},{%- endfor %}
 
 [gh]
 python =
