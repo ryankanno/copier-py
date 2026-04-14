@@ -3,6 +3,8 @@ name: docs
 on:
   push:
     branches: [ main ]
+  release:
+    types: [published]
   pull_request:
     branches: [ main ]
 
@@ -12,61 +14,141 @@ on:
 env:
   UV_VERSION: 0.10.9
   TOX_VERSION: 4.25.0
-  PRE_COMMIT_CACHE: ~/.cache/pre-commit
+  PYTHON_VERSION: "3.11"
+  MAX_VERSIONS: 10
 
 jobs:
-  tox-docs:
-    strategy:
-      fail-fast: false
-      matrix:
-        python-version:
-          - "3.11"
-        os: [ubuntu-latest]
-        env:
-          - TOXENV: "docs"
-    runs-on: ${{ matrix.os }}
+  build-docs:
+    runs-on: ubuntu-latest
     permissions:
       contents: write
     steps:
       - uses: actions/checkout@v6
-      - name: Configure Python ${{ matrix.python-version }}
+        with:
+          fetch-depth: 0
+
+      - name: Configure Python ${{ env.PYTHON_VERSION }}
         uses: actions/setup-python@v6
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: ${{ env.PYTHON_VERSION }}
+
       - name: Install uv
         uses: astral-sh/setup-uv@v7
         with:
           version: ${{ env.UV_VERSION }}
           enable-cache: true
-          cache-suffix: ${{ matrix.os }}-${{ matrix.python-version }}-uv_docs
+          cache-suffix: uv_docs
+
       - name: Install tox
         run: uv tool install --python-preference only-system tox==${{ env.TOX_VERSION }} --with tox-gh
-      - name: Cache pre-commit
-        uses: actions/cache@v5
-        with:
-          path: ${{ env.PRE_COMMIT_CACHE }}
-          key: ${{ matrix.os }}-${{ matrix.python-version }}-pre-commit-${{ hashFiles('.pre-commit-config.yaml') }}
-      - name: Run tox
+
+      - name: Compute version
+        id: version
         run: |
-          tox
-        shell: bash
-        env: ${{ matrix.env }}
+          VERSION=$(uvx dunamai from git --no-metadata --style semver 2>/dev/null || echo "dev")
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          if [[ "${{ github.event_name }}" == "release" ]]; then
+            echo "dest_dir=${{ github.event.release.tag_name }}" >> $GITHUB_OUTPUT
+          else
+            echo "dest_dir=latest" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Build docs
+        run: tox -e docs
+        env:
+          DOCS_VERSION: ${{ steps.version.outputs.version }}
+
       - name: Prepare docs artifact
         if: always()
         shell: bash
         run: |
-          mkdir artifact
+          mkdir -p artifact
           cp -a .tox/docs_out/ artifact/html_docs
+
       - name: Upload docs artifact
         if: always()
         uses: actions/upload-artifact@v7
         with:
           name: html_docs
           path: ./artifact
-      - name: Deploy to gh pages
-        if: ${{ github.event_name == 'push' && github.ref_name ==  github.event.repository.default_branch }}
+
+      - name: Deploy to gh-pages
+        if: github.event_name == 'push' || github.event_name == 'release'
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: .tox/docs_out/
-          destination_dir: ./latest
+          destination_dir: ./${{ steps.version.outputs.dest_dir }}
+          keep_files: true
+
+      - name: Update versions.json and prune old versions
+        if: github.event_name == 'push' || github.event_name == 'release'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          # Fetch gh-pages
+          git fetch origin gh-pages:gh-pages 2>/dev/null || true
+          git worktree add /tmp/gh-pages gh-pages 2>/dev/null || {
+            git worktree add /tmp/gh-pages --orphan gh-pages
+          }
+
+          cd /tmp/gh-pages
+
+          # Create root index.html redirect
+          cat > index.html << 'REDIRECT'
+          <!DOCTYPE html>
+          <html>
+            <head>
+              <meta http-equiv="refresh" content="0; url=latest/">
+              <link rel="canonical" href="latest/">
+            </head>
+            <body>
+              <p>Redirecting to <a href="latest/">latest documentation</a>...</p>
+            </body>
+          </html>
+          REDIRECT
+
+          # Build versions.json from existing v* directories
+          VERSIONS="[]"
+          for dir in $(ls -d v*/ 2>/dev/null | sort -V -r); do
+            ver=$(basename "$dir")
+            VERSIONS=$(echo "$VERSIONS" | python3 -c "
+          import json, sys
+          versions = json.load(sys.stdin)
+          versions.append({'name': '$ver', 'url': '$ver/'})
+          json.dump(versions, sys.stdout)
+          ")
+          done
+
+          # Add latest entry at the beginning
+          VERSIONS=$(echo "$VERSIONS" | python3 -c "
+          import json, sys
+          versions = json.load(sys.stdin)
+          versions.insert(0, {'name': 'latest', 'url': 'latest/'})
+          json.dump(versions, sys.stdout, indent=2)
+          ")
+          echo "$VERSIONS" > versions.json
+
+          # Prune old versions (keep newest MAX_VERSIONS)
+          VERSION_DIRS=$(ls -d v*/ 2>/dev/null | sort -V -r)
+          COUNT=0
+          for dir in $VERSION_DIRS; do
+            COUNT=$((COUNT + 1))
+            if [ $COUNT -gt ${{ env.MAX_VERSIONS }} ]; then
+              echo "Pruning old version: $dir"
+              rm -rf "$dir"
+            fi
+          done
+
+          # Commit and push
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "docs: update versions.json and prune old versions"
+            git push origin gh-pages
+          fi
+
+          cd -
+          git worktree remove /tmp/gh-pages --force 2>/dev/null || true

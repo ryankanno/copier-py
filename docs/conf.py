@@ -3,6 +3,7 @@
 # For the full list of built-in configuration values, see the documentation:
 # https://www.sphinx-doc.org/en/master/usage/configuration.html
 
+import os
 import sys
 from pathlib import Path
 
@@ -15,6 +16,8 @@ sys.path.insert(0, str(Path('../copier_py/').resolve()))
 project = 'copier-py'
 project_copyright = '2026, Ryan Kanno'
 author = 'Ryan Kanno'
+version = os.environ.get('DOCS_VERSION', 'dev')
+release = version
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
