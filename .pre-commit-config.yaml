@@ -29,22 +29,9 @@ repos:
       args: ['--config', 'pyproject.toml', '--fix', '--exit-non-zero-on-fix']
       exclude: ^template/
       stages: [manual]
-  - repo: https://github.com/psf/black-pre-commit-mirror
-    rev: 24.10.0
-    hooks:
-      - id: black
-        args: ['--config', 'pyproject.toml']
-        exclude: ^template/
-  - repo: https://github.com/adamchainz/blacken-docs
-    rev: 1.19.1
-    hooks:
-      - id: blacken-docs
-        additional_dependencies: [black==24.10.0]
-  - repo: https://github.com/pycqa/isort
-    rev: 5.13.2
-    hooks:
-      - id: isort
-        exclude: ^template/
+    - id: ruff-format
+      args: ['--config', 'pyproject.toml']
+      exclude: ^template/
   - repo: https://github.com/pre-commit/pygrep-hooks
     rev: v1.10.0
     hooks:

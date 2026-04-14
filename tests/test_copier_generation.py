@@ -16,6 +16,7 @@ import pytest
 from binaryornot.check import is_binary
 from copier import run_copy
 
+
 LOGGER = logging.getLogger(__name__)
 
 TEMPLATE_DIR = str(Path(__file__).parent.parent)
@@ -766,6 +767,47 @@ def test_with_python_version(
                 if s.find(py_env) == -1:
                     pytest.fail(
                         f"tox.ini should include {py_env.decode()} environment"
+                    )
+
+
+THIRD_PARTY_SPHINX_THEMES = [
+    "furo",
+    "sphinx-rtd-theme",
+    "sphinx-book-theme",
+    "pydata-sphinx-theme",
+    "sphinx-press-theme",
+    "piccolo-theme",
+    "sphinxawesome-theme",
+    "sphinx-wagtail-theme",
+]
+
+
+@pytest.mark.parametrize("sphinx_theme", THIRD_PARTY_SPHINX_THEMES)
+def test_with_sphinx_theme(
+    tmp_path: Path,
+    default_context: dict[str, str | bool],
+    sphinx_theme: str,
+) -> None:
+    """Verify generated pyproject.toml has correct sphinx theme package."""
+    default_context["sphinx_theme"] = sphinx_theme
+    dest = generate_project(tmp_path, default_context)
+
+    assert dest.is_dir()
+
+    abs_baked_files = build_files_list(str(dest))
+
+    for path in abs_baked_files:
+        if "pyproject.toml" in path:
+            with (
+                Path(path).open("rb", 0) as file,
+                mmap.mmap(
+                    file.fileno(), 0, access=mmap.ACCESS_READ
+                ) as s,
+            ):
+                if s.find(sphinx_theme.encode()) == -1:
+                    pytest.fail(
+                        f"pyproject.toml should contain"
+                        f" {sphinx_theme}"
                     )
 
 
