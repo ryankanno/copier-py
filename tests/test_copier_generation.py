@@ -588,9 +588,9 @@ def test_dockerfile_structure(
 
     # Verify no unrendered template variables
     for i, line in enumerate(lines, 1):
-        assert (
-            RE_OBJ.search(line) is None
-        ), f"Unrendered template variable on line {i}: {line}"
+        assert RE_OBJ.search(line) is None, (
+            f"Unrendered template variable on line {i}: {line}"
+        )
 
     # Verify multi-stage build has required stages
     stage_names = parse_dockerfile_stages(lines)
@@ -601,9 +601,9 @@ def test_dockerfile_structure(
         "project-builder",
         "final",
     ]:
-        assert (
-            expected_stage in stage_names
-        ), f"Missing expected stage: {expected_stage}"
+        assert expected_stage in stage_names, (
+            f"Missing expected stage: {expected_stage}"
+        )
 
     # Verify COPY --from references point to defined stages
     defined_sources = set(stage_names) | {"uv-source"}
@@ -611,9 +611,9 @@ def test_dockerfile_structure(
         if "COPY --from=" not in line:
             continue
         from_ref = line.split("--from=")[1].split()[0]
-        assert (
-            from_ref in defined_sources
-        ), f"COPY --from={from_ref} references undefined stage"
+        assert from_ref in defined_sources, (
+            f"COPY --from={from_ref} references undefined stage"
+        )
 
     # Verify final stage runs as non-root user
     final_lines = get_stage_lines(lines, "final")
@@ -800,14 +800,11 @@ def test_with_sphinx_theme(
         if "pyproject.toml" in path:
             with (
                 Path(path).open("rb", 0) as file,
-                mmap.mmap(
-                    file.fileno(), 0, access=mmap.ACCESS_READ
-                ) as s,
+                mmap.mmap(file.fileno(), 0, access=mmap.ACCESS_READ) as s,
             ):
                 if s.find(sphinx_theme.encode()) == -1:
                     pytest.fail(
-                        f"pyproject.toml should contain"
-                        f" {sphinx_theme}"
+                        f"pyproject.toml should contain {sphinx_theme}"
                     )
 
 
