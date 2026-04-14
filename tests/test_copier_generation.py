@@ -577,11 +577,7 @@ def test_dockerfile_structure(
     abs_baked_files = build_files_list(str(dest))
 
     dockerfile_path = next(
-        (
-            path
-            for path in abs_baked_files
-            if path.endswith("Dockerfile")
-        ),
+        (path for path in abs_baked_files if path.endswith("Dockerfile")),
         None,
     )
     assert dockerfile_path is not None, "Dockerfile should exist"
@@ -591,9 +587,9 @@ def test_dockerfile_structure(
 
     # Verify no unrendered template variables
     for i, line in enumerate(lines, 1):
-        assert RE_OBJ.search(line) is None, (
-            f"Unrendered template variable on line {i}: {line}"
-        )
+        assert (
+            RE_OBJ.search(line) is None
+        ), f"Unrendered template variable on line {i}: {line}"
 
     # Verify multi-stage build has required stages
     stage_names = parse_dockerfile_stages(lines)
@@ -604,9 +600,9 @@ def test_dockerfile_structure(
         "project-builder",
         "final",
     ]:
-        assert expected_stage in stage_names, (
-            f"Missing expected stage: {expected_stage}"
-        )
+        assert (
+            expected_stage in stage_names
+        ), f"Missing expected stage: {expected_stage}"
 
     # Verify COPY --from references point to defined stages
     defined_sources = set(stage_names) | {"uv-source"}
@@ -614,19 +610,15 @@ def test_dockerfile_structure(
         if "COPY --from=" not in line:
             continue
         from_ref = line.split("--from=")[1].split()[0]
-        assert from_ref in defined_sources, (
-            f"COPY --from={from_ref} references undefined stage"
-        )
+        assert (
+            from_ref in defined_sources
+        ), f"COPY --from={from_ref} references undefined stage"
 
     # Verify final stage runs as non-root user
     final_lines = get_stage_lines(lines, "final")
-    user_lines = [
-        line for line in final_lines if line.startswith("USER ")
-    ]
+    user_lines = [line for line in final_lines if line.startswith("USER ")]
     assert user_lines, "Final stage should set a non-root USER"
-    assert (
-        user_lines[-1] != "USER root"
-    ), "Final stage should not run as root"
+    assert user_lines[-1] != "USER root", "Final stage should not run as root"
 
 
 @pytest.mark.parametrize("tox_version", ["8.0.8", "4.2.0"])
