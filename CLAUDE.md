@@ -28,7 +28,7 @@ The template generates projects with:
 - `uv` for dependency management
 - `tox` for testing across Python versions (3.11, 3.12, 3.13, PyPy)
 - `pytest` with coverage, xdist, randomly, mock, and hypothesis
-- `ruff` for linting and formatting
+- `ruff` for linting, formatting, and import sorting
 - `mypy` for type checking
 - `sphinx` for documentation with selectable themes
 - Pre-commit hooks with comprehensive tooling (detect-secrets, commitlint, bashate, typos, deptry)
