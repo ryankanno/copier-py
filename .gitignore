@@ -47,6 +47,9 @@ docs/sources/
 # hypothesis
 .hypothesis/
 
+# worktrees
+.worktrees/
+
 # direnv
 .direnv/
 
