@@ -2,10 +2,12 @@
 <html class="no-js" lang="en" data-content_root="./">
   <head><meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="genindex.html"><link rel="search" title="Search" href="search.html">
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="genindex.html"><link rel="search" title="Search" href="search.html"><link rel="prev" title="Generated Project Structure Reference" href="reference-project-structure.html">
 
-    <!-- Generated with Sphinx 8.2.3 and Furo 2025.12.19 --><title>Python Module Index - copier-py 0.0.0-post.35 documentation</title>
-<link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d111a655" />
+    <!-- Generated with Sphinx 8.2.3 and Furo 2025.12.19 -->
+        <title>Why These Tools? - copier-py 0.0.0-post.35 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=8dab3a3b" />
     
@@ -170,7 +172,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
       </label>
     </div>
@@ -204,8 +206,8 @@
 <li class="toctree-l1"><a class="reference internal" href="reference-project-structure.html">Generated Project Structure Reference</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Explanation</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="explanation-design.html">Why These Tools?</a></li>
+<ul class="current">
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Why These Tools?</a></li>
 </ul>
 
 </div>
@@ -225,7 +227,13 @@
           <span>Back to top</span>
         </a>
         <div class="content-icon-container">
-          <div class="theme-toggle-container theme-toggle-content">
+          <div class="view-this-page">
+  <a class="muted-link" href="_sources/explanation-design.md.txt" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div>
+<div class="theme-toggle-container theme-toggle-content">
             <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
               <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
               <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
@@ -233,30 +241,77 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
             <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          
-<section class="domainindex-section">
-  <h1>Python Module Index</h1>
-  <div class="domainindex-jumpbox"><a href="#cap-c"><strong>c</strong></a></div>
+          <section class="tex2jax_ignore mathjax_ignore" id="why-these-tools">
+<h1>Why These Tools?<a class="headerlink" href="#why-these-tools" title="Link to this heading">¶</a></h1>
+<p>This page explains the rationale behind the tools and patterns chosen for the copier-py template.</p>
+<section id="uv-for-dependency-management">
+<h2>uv for dependency management<a class="headerlink" href="#uv-for-dependency-management" title="Link to this heading">¶</a></h2>
+<p><a class="reference external" href="https://docs.astral.sh/uv/">uv</a> replaces pip, pip-tools, and virtualenv in a single tool written in Rust. It resolves and installs dependencies significantly faster than pip, supports lockfiles natively, and handles Python version management. The template uses uv as the primary package manager because it simplifies the developer experience — one tool handles what previously required three or four.</p>
 </section>
-<table class="domainindex-table">
-  <tr class="pcap">
-    <td></td><td>&#160;</td><td></td>
-  </tr>
-  <tr class="cap" id="cap-c">
-    <td></td><td><strong>c</strong></td><td></td>
-  </tr>
-  <tr>
-    <td></td>
-    <td>
-        <a href="sources/copier_py.html#module-copier_py"><code class="xref">copier_py</code></a></td><td>
-    <em></em></td>
-  </tr>
-</table>
+<section id="ruff-for-linting-and-formatting">
+<h2>ruff for linting and formatting<a class="headerlink" href="#ruff-for-linting-and-formatting" title="Link to this heading">¶</a></h2>
+<p><a class="reference external" href="https://docs.astral.sh/ruff/">ruff</a> consolidates flake8, isort, pyflakes, pycodestyle, and black into a single Rust-based tool. It runs orders of magnitude faster than the Python-based tools it replaces and enforces consistent style without requiring developers to configure multiple tools separately. The template uses ruff for linting, formatting, and import sorting.</p>
+</section>
+<section id="tox-for-test-automation">
+<h2>tox for test automation<a class="headerlink" href="#tox-for-test-automation" title="Link to this heading">¶</a></h2>
+<p><a class="reference external" href="https://tox.wiki/">tox</a> provides reproducible test environments across multiple Python versions. While uv handles dependency management, tox manages the matrix of Python versions and test configurations (unit tests, coverage, linting, docs). This separation keeps <code class="docutils literal notranslate"><span class="pre">pyproject.toml</span></code> focused on project metadata and lets tox orchestrate the full test and quality pipeline.</p>
+</section>
+<section id="pytest-with-hypothesis-and-mutmut">
+<h2>pytest with hypothesis and mutmut<a class="headerlink" href="#pytest-with-hypothesis-and-mutmut" title="Link to this heading">¶</a></h2>
+<p><a class="reference external" href="https://docs.pytest.org/">pytest</a> is the standard Python testing framework. The template adds <a class="reference external" href="https://hypothesis.readthedocs.io/">hypothesis</a> for property-based testing — it generates test cases automatically to find edge cases that example-based tests miss. <a class="reference external" href="https://mutmut.readthedocs.io/">mutmut</a> provides mutation testing, which verifies that your tests actually catch bugs by introducing small changes to source code and checking that tests fail. Together, these tools provide confidence beyond line coverage.</p>
+<p>The template also includes <a class="reference external" href="https://pytest-xdist.readthedocs.io/">pytest-xdist</a> for parallel test execution and <a class="reference external" href="https://github.com/pytest-dev/pytest-randomly">pytest-randomly</a> to randomize test order, exposing hidden dependencies between tests.</p>
+</section>
+<section id="mypy-for-type-checking">
+<h2>mypy for type checking<a class="headerlink" href="#mypy-for-type-checking" title="Link to this heading">¶</a></h2>
+<p><a class="reference external" href="https://mypy-lang.org/">mypy</a> catches type errors before runtime. Python’s type system is optional, but mypy makes it useful — it finds bugs that tests might miss, like passing a string where an integer is expected. The template configures mypy in strict mode to maximize the value of type annotations.</p>
+</section>
+<section id="sphinx-with-myst-parser">
+<h2>sphinx with MyST parser<a class="headerlink" href="#sphinx-with-myst-parser" title="Link to this heading">¶</a></h2>
+<p><a class="reference external" href="https://www.sphinx-doc.org/">Sphinx</a> is the established documentation tool for Python projects. The template adds <a class="reference external" href="https://myst-parser.readthedocs.io/">MyST parser</a> to support writing documentation in Markdown alongside reStructuredText. This lowers the barrier for contributors who are more familiar with Markdown while retaining Sphinx’s powerful cross-referencing, autodoc, and theme ecosystem.</p>
+<p>The template offers 17 Sphinx themes. <a class="reference external" href="https://pradyunsg.me/furo/">Furo</a> is the default because it provides a clean, modern design with dark mode support, good mobile responsiveness, and minimal configuration.</p>
+</section>
+<section id="pre-commit-for-automated-checks">
+<h2>pre-commit for automated checks<a class="headerlink" href="#pre-commit-for-automated-checks" title="Link to this heading">¶</a></h2>
+<p><a class="reference external" href="https://pre-commit.com/">pre-commit</a> runs checks before each commit, catching issues early in the development cycle. The template configures hooks for:</p>
+<ul class="simple">
+<li><p><strong>ruff</strong> — linting and formatting</p></li>
+<li><p><strong>mypy</strong> — type checking</p></li>
+<li><p><strong>detect-secrets</strong> — prevents accidental credential commits</p></li>
+<li><p><strong>commitlint</strong> — enforces <a class="reference external" href="https://www.conventionalcommits.org/">Conventional Commits</a> for consistent, parseable commit messages</p></li>
+<li><p><strong>bashate</strong> — lints shell scripts</p></li>
+<li><p><strong>typos</strong> — catches spelling mistakes in code and docs</p></li>
+<li><p><strong>deptry</strong> — detects unused, missing, or transitive dependencies</p></li>
+</ul>
+<p>Running these checks locally means developers get fast feedback without waiting for CI.</p>
+</section>
+<section id="src-layout">
+<h2>src layout<a class="headerlink" href="#src-layout" title="Link to this heading">¶</a></h2>
+<p>The template uses a <a class="reference external" href="https://packaging.python.org/en/latest/discussions/src-layout-vs-flat-layout/">src layout</a> where package code lives under <code class="docutils literal notranslate"><span class="pre">src/</span></code>. This prevents accidental imports of the development version during testing — when you run <code class="docutils literal notranslate"><span class="pre">pytest</span></code>, Python imports from the installed package, not from the local directory. This catches packaging issues early that a flat layout would hide.</p>
+</section>
+<section id="dockerfile-with-multi-stage-build">
+<h2>Dockerfile with multi-stage build<a class="headerlink" href="#dockerfile-with-multi-stage-build" title="Link to this heading">¶</a></h2>
+<p>The generated Dockerfile uses a multi-stage build with separate stages for development, testing, and production. This keeps the production image small (no dev dependencies) while providing full tooling in development. The final stage runs as a non-root user for security.</p>
+</section>
+<section id="github-actions-workflow-design">
+<h2>GitHub Actions workflow design<a class="headerlink" href="#github-actions-workflow-design" title="Link to this heading">¶</a></h2>
+<p>The template generates separate workflows for distinct concerns rather than a single monolithic workflow:</p>
+<ul class="simple">
+<li><p><strong>CI</strong> handles testing and quality checks on every push</p></li>
+<li><p><strong>Publish</strong> handles package distribution on releases</p></li>
+<li><p><strong>Security workflows</strong> (CodeQL, trufflehog) run on their own schedules</p></li>
+</ul>
+<p>This separation means a failing security scan doesn’t block CI, and CI failures don’t prevent documentation builds. Each workflow uses GitHub environments for deployment protection where appropriate.</p>
+</section>
+<section id="copier-over-cookiecutter">
+<h2>Copier over Cookiecutter<a class="headerlink" href="#copier-over-cookiecutter" title="Link to this heading">¶</a></h2>
+<p>This template uses <a class="reference external" href="https://copier.readthedocs.io/">copier</a> instead of <a class="reference external" href="https://cookiecutter.readthedocs.io/">cookiecutter</a> for project generation. Copier provides a key advantage: <code class="docutils literal notranslate"><span class="pre">copier</span> <span class="pre">update</span></code>. When the template evolves, projects generated from it can pull in improvements without manual diffing. Copier also supports conditional file inclusion, typed questions with validation, and Jinja2 templating with a cleaner configuration format.</p>
+</section>
+</section>
 
         </article>
       </div>
@@ -264,7 +319,17 @@
         
         <div class="related-pages">
           
-          
+          <a class="prev-page" href="reference-project-structure.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">Generated Project Structure Reference</div>
+                
+              </div>
+            </a>
         </div>
         <div class="bottom-of-page">
           <div class="left-details">
@@ -283,8 +348,37 @@
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Why These Tools?</a><ul>
+<li><a class="reference internal" href="#uv-for-dependency-management">uv for dependency management</a></li>
+<li><a class="reference internal" href="#ruff-for-linting-and-formatting">ruff for linting and formatting</a></li>
+<li><a class="reference internal" href="#tox-for-test-automation">tox for test automation</a></li>
+<li><a class="reference internal" href="#pytest-with-hypothesis-and-mutmut">pytest with hypothesis and mutmut</a></li>
+<li><a class="reference internal" href="#mypy-for-type-checking">mypy for type checking</a></li>
+<li><a class="reference internal" href="#sphinx-with-myst-parser">sphinx with MyST parser</a></li>
+<li><a class="reference internal" href="#pre-commit-for-automated-checks">pre-commit for automated checks</a></li>
+<li><a class="reference internal" href="#src-layout">src layout</a></li>
+<li><a class="reference internal" href="#dockerfile-with-multi-stage-build">Dockerfile with multi-stage build</a></li>
+<li><a class="reference internal" href="#github-actions-workflow-design">GitHub Actions workflow design</a></li>
+<li><a class="reference internal" href="#copier-over-cookiecutter">Copier over Cookiecutter</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>
@@ -293,6 +387,5 @@
     <script src="_static/doctools.js?v=9bcbadda"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/scripts/furo.js?v=46bd48cc"></script>
-    
-    <script>DOCUMENTATION_OPTIONS.COLLAPSE_INDEX = true</script></body>
+    </body>
 </html>

@@ -2,10 +2,12 @@
 <html class="no-js" lang="en" data-content_root="./">
   <head><meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="genindex.html"><link rel="search" title="Search" href="search.html">
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="genindex.html"><link rel="search" title="Search" href="search.html"><link rel="next" title="How to Update an Existing Project" href="howto-update.html"><link rel="prev" title="How to Set Up Publishing to PyPI" href="howto-publishing.html">
 
-    <!-- Generated with Sphinx 8.2.3 and Furo 2025.12.19 --><title>Python Module Index - copier-py 0.0.0-post.35 documentation</title>
-<link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d111a655" />
+    <!-- Generated with Sphinx 8.2.3 and Furo 2025.12.19 -->
+        <title>How to Configure CI with GitHub Actions - copier-py 0.0.0-post.35 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=8dab3a3b" />
     
@@ -170,7 +172,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
       </label>
     </div>
@@ -193,9 +195,9 @@
 <li class="toctree-l1"><a class="reference internal" href="tutorial.html">Tutorial: Create Your First Python Project</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">How-to Guides</span></p>
-<ul>
+<ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="howto-publishing.html">How to Set Up Publishing to PyPI</a></li>
-<li class="toctree-l1"><a class="reference internal" href="howto-ci.html">How to Configure CI with GitHub Actions</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">How to Configure CI with GitHub Actions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="howto-update.html">How to Update an Existing Project</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Reference</span></p>
@@ -225,7 +227,13 @@
           <span>Back to top</span>
         </a>
         <div class="content-icon-container">
-          <div class="theme-toggle-container theme-toggle-content">
+          <div class="view-this-page">
+  <a class="muted-link" href="_sources/howto-ci.md.txt" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div>
+<div class="theme-toggle-container theme-toggle-content">
             <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
               <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
               <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
@@ -233,38 +241,136 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
             <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          
-<section class="domainindex-section">
-  <h1>Python Module Index</h1>
-  <div class="domainindex-jumpbox"><a href="#cap-c"><strong>c</strong></a></div>
+          <section class="tex2jax_ignore mathjax_ignore" id="how-to-configure-ci-with-github-actions">
+<h1>How to Configure CI with GitHub Actions<a class="headerlink" href="#how-to-configure-ci-with-github-actions" title="Link to this heading">¶</a></h1>
+<p>This guide covers customizing the GitHub Actions workflows that come with your generated project.</p>
+<section id="enable-github-actions-during-generation">
+<h2>Enable GitHub Actions during generation<a class="headerlink" href="#enable-github-actions-during-generation" title="Link to this heading">¶</a></h2>
+<p>When running <code class="docutils literal notranslate"><span class="pre">copier</span> <span class="pre">copy</span></code>, answer <code class="docutils literal notranslate"><span class="pre">yes</span></code> to the GitHub Actions question:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>🎤 Install GitHub Actions workflows?
+   Yes
+</pre></div>
+</div>
+<p>This generates the following workflows in <code class="docutils literal notranslate"><span class="pre">.github/workflows/</span></code>:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">ci.yml</span></code> — runs tests, linting, and type checking</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">publish.yml</span></code> — builds and publishes packages</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">codeql.yml</span></code> — CodeQL security analysis</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">hadolint.yml</span></code> — Dockerfile linting</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">commitlint.yml</span></code> — commit message validation</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">trufflehog.yml</span></code> — secret scanning</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">docs.yml</span></code> — documentation publishing</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">release-drafter.yml</span></code> — automated release notes</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">pr-size-labeling.yml</span></code> — PR size classification</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">pr-labeler.yml</span></code> — automated PR labeling</p></li>
+</ul>
 </section>
-<table class="domainindex-table">
-  <tr class="pcap">
-    <td></td><td>&#160;</td><td></td>
-  </tr>
-  <tr class="cap" id="cap-c">
-    <td></td><td><strong>c</strong></td><td></td>
-  </tr>
-  <tr>
-    <td></td>
-    <td>
-        <a href="sources/copier_py.html#module-copier_py"><code class="xref">copier_py</code></a></td><td>
-    <em></em></td>
-  </tr>
+<section id="enable-codecov-integration">
+<h2>Enable Codecov integration<a class="headerlink" href="#enable-codecov-integration" title="Link to this heading">¶</a></h2>
+<p>To upload test coverage to <a class="reference external" href="https://codecov.io">Codecov</a>:</p>
+<ol class="arabic simple">
+<li><p>Answer <code class="docutils literal notranslate"><span class="pre">yes</span></code> to “Upload coverage to Codecov?” during generation</p></li>
+<li><p>Sign up at <a class="reference external" href="https://codecov.io">codecov.io</a> and add your repository</p></li>
+<li><p>For public repositories, no token is needed</p></li>
+<li><p>For private repositories, add your Codecov token as a repository secret named <code class="docutils literal notranslate"><span class="pre">CODECOV_TOKEN</span></code></p></li>
+</ol>
+</section>
+<section id="configure-dependabot-auto-merge">
+<h2>Configure Dependabot auto-merge<a class="headerlink" href="#configure-dependabot-auto-merge" title="Link to this heading">¶</a></h2>
+<p>To auto-approve and auto-merge Dependabot PRs:</p>
+<ol class="arabic">
+<li><p>Answer <code class="docutils literal notranslate"><span class="pre">yes</span></code> to both:</p>
+<ul class="simple">
+<li><p>“Install GitHub Dependabot configuration?”</p></li>
+<li><p>“Auto-approve and auto-merge Dependabot PRs?”</p></li>
+</ul>
+</li>
+<li><p>Create version tags for PR classification:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>tag<span class="w"> </span>major<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>git<span class="w"> </span>push<span class="w"> </span>origin<span class="w"> </span>major
+git<span class="w"> </span>tag<span class="w"> </span>minor<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>git<span class="w"> </span>push<span class="w"> </span>origin<span class="w"> </span>minor
+git<span class="w"> </span>tag<span class="w"> </span>patch<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>git<span class="w"> </span>push<span class="w"> </span>origin<span class="w"> </span>patch
+</pre></div>
+</div>
+</li>
+<li><p>The workflow auto-merges <code class="docutils literal notranslate"><span class="pre">minor</span></code> and <code class="docutils literal notranslate"><span class="pre">patch</span></code> updates but blocks <code class="docutils literal notranslate"><span class="pre">major</span></code> version bumps for manual review</p></li>
+</ol>
+</section>
+<section id="customize-the-ci-matrix">
+<h2>Customize the CI matrix<a class="headerlink" href="#customize-the-ci-matrix" title="Link to this heading">¶</a></h2>
+<p>The CI workflow tests across the Python versions you specified during generation. To change the matrix, edit <code class="docutils literal notranslate"><span class="pre">.github/workflows/ci.yml</span></code>:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">strategy</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">matrix</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">python-version</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&quot;3.11&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;3.12&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;3.13&quot;</span><span class="p p-Indicator">]</span>
+</pre></div>
+</div>
+<p>Update <code class="docutils literal notranslate"><span class="pre">tox.ini</span></code> and <code class="docutils literal notranslate"><span class="pre">pyproject.toml</span></code> to match if you add or remove Python versions.</p>
+</section>
+<section id="add-repository-secrets">
+<h2>Add repository secrets<a class="headerlink" href="#add-repository-secrets" title="Link to this heading">¶</a></h2>
+<p>Some workflows require secrets. Add them in <strong>Settings</strong> → <strong>Secrets and variables</strong> → <strong>Actions</strong>:</p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Secret</p></th>
+<th class="head"><p>Used by</p></th>
+<th class="head"><p>Required when</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">CODECOV_TOKEN</span></code></p></td>
+<td><p>CI workflow</p></td>
+<td><p>Private repos with Codecov</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">PAT</span></code></p></td>
+<td><p>Auto-approve workflow</p></td>
+<td><p>Dependabot auto-merge enabled</p></td>
+</tr>
+</tbody>
 </table>
+</div>
+</section>
+<section id="monitor-workflow-runs">
+<h2>Monitor workflow runs<a class="headerlink" href="#monitor-workflow-runs" title="Link to this heading">¶</a></h2>
+<p>Check the <strong>Actions</strong> tab in your GitHub repository. Each workflow runs on its configured trigger:</p>
+<ul class="simple">
+<li><p><strong>CI</strong>: runs on every push and pull request</p></li>
+<li><p><strong>CodeQL</strong>: runs on push to main and on a weekly schedule</p></li>
+<li><p><strong>Publish</strong>: runs on push to main (TestPyPI) and on release (PyPI)</p></li>
+<li><p><strong>Docs</strong>: runs on push to main and on release</p></li>
+</ul>
+</section>
+</section>
 
         </article>
       </div>
       <footer>
         
         <div class="related-pages">
-          
-          
+          <a class="next-page" href="howto-update.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">How to Update an Existing Project</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="howto-publishing.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">How to Set Up Publishing to PyPI</div>
+                
+              </div>
+            </a>
         </div>
         <div class="bottom-of-page">
           <div class="left-details">
@@ -283,8 +389,32 @@
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">How to Configure CI with GitHub Actions</a><ul>
+<li><a class="reference internal" href="#enable-github-actions-during-generation">Enable GitHub Actions during generation</a></li>
+<li><a class="reference internal" href="#enable-codecov-integration">Enable Codecov integration</a></li>
+<li><a class="reference internal" href="#configure-dependabot-auto-merge">Configure Dependabot auto-merge</a></li>
+<li><a class="reference internal" href="#customize-the-ci-matrix">Customize the CI matrix</a></li>
+<li><a class="reference internal" href="#add-repository-secrets">Add repository secrets</a></li>
+<li><a class="reference internal" href="#monitor-workflow-runs">Monitor workflow runs</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>
@@ -293,6 +423,5 @@
     <script src="_static/doctools.js?v=9bcbadda"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/scripts/furo.js?v=46bd48cc"></script>
-    
-    <script>DOCUMENTATION_OPTIONS.COLLAPSE_INDEX = true</script></body>
+    </body>
 </html>

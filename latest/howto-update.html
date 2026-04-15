@@ -2,10 +2,12 @@
 <html class="no-js" lang="en" data-content_root="./">
   <head><meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="genindex.html"><link rel="search" title="Search" href="search.html">
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="genindex.html"><link rel="search" title="Search" href="search.html"><link rel="next" title="Configuration Variables Reference" href="reference-configuration.html"><link rel="prev" title="How to Configure CI with GitHub Actions" href="howto-ci.html">
 
-    <!-- Generated with Sphinx 8.2.3 and Furo 2025.12.19 --><title>Python Module Index - copier-py 0.0.0-post.35 documentation</title>
-<link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d111a655" />
+    <!-- Generated with Sphinx 8.2.3 and Furo 2025.12.19 -->
+        <title>How to Update an Existing Project - copier-py 0.0.0-post.35 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=8dab3a3b" />
     
@@ -170,7 +172,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
       </label>
     </div>
@@ -193,10 +195,10 @@
 <li class="toctree-l1"><a class="reference internal" href="tutorial.html">Tutorial: Create Your First Python Project</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">How-to Guides</span></p>
-<ul>
+<ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="howto-publishing.html">How to Set Up Publishing to PyPI</a></li>
 <li class="toctree-l1"><a class="reference internal" href="howto-ci.html">How to Configure CI with GitHub Actions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="howto-update.html">How to Update an Existing Project</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">How to Update an Existing Project</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Reference</span></p>
 <ul>
@@ -225,7 +227,13 @@
           <span>Back to top</span>
         </a>
         <div class="content-icon-container">
-          <div class="theme-toggle-container theme-toggle-content">
+          <div class="view-this-page">
+  <a class="muted-link" href="_sources/howto-update.md.txt" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div>
+<div class="theme-toggle-container theme-toggle-content">
             <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
               <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
               <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
@@ -233,38 +241,94 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
             <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          
-<section class="domainindex-section">
-  <h1>Python Module Index</h1>
-  <div class="domainindex-jumpbox"><a href="#cap-c"><strong>c</strong></a></div>
+          <section class="tex2jax_ignore mathjax_ignore" id="how-to-update-an-existing-project">
+<h1>How to Update an Existing Project<a class="headerlink" href="#how-to-update-an-existing-project" title="Link to this heading">¶</a></h1>
+<p>This guide covers updating a project that was generated with copier-py to incorporate template improvements.</p>
+<section id="update-to-the-latest-template">
+<h2>Update to the latest template<a class="headerlink" href="#update-to-the-latest-template" title="Link to this heading">¶</a></h2>
+<p>Run <code class="docutils literal notranslate"><span class="pre">copier</span> <span class="pre">update</span></code> in your project directory:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>/path/to/your-project
+copier<span class="w"> </span>update<span class="w"> </span>--trust
+</pre></div>
+</div>
+<p>Copier compares your project against the latest template version and applies changes. If there are conflicts between your modifications and template updates, copier presents a diff for you to resolve.</p>
 </section>
-<table class="domainindex-table">
-  <tr class="pcap">
-    <td></td><td>&#160;</td><td></td>
-  </tr>
-  <tr class="cap" id="cap-c">
-    <td></td><td><strong>c</strong></td><td></td>
-  </tr>
-  <tr>
-    <td></td>
-    <td>
-        <a href="sources/copier_py.html#module-copier_py"><code class="xref">copier_py</code></a></td><td>
-    <em></em></td>
-  </tr>
-</table>
+<section id="update-to-a-specific-template-version">
+<h2>Update to a specific template version<a class="headerlink" href="#update-to-a-specific-template-version" title="Link to this heading">¶</a></h2>
+<p>To update to a specific tag or commit of the template:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>copier<span class="w"> </span>update<span class="w"> </span>--trust<span class="w"> </span>--vcs-ref<span class="w"> </span>v1.2.0
+</pre></div>
+</div>
+</section>
+<section id="change-configuration-options">
+<h2>Change configuration options<a class="headerlink" href="#change-configuration-options" title="Link to this heading">¶</a></h2>
+<p>To change options you selected during initial generation (e.g., enable publishing, change the Sphinx theme):</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>copier<span class="w"> </span>update<span class="w"> </span>--trust
+</pre></div>
+</div>
+<p>Copier re-prompts you for all configuration values, pre-filled with your previous answers. Change any values you want and copier regenerates the affected files.</p>
+</section>
+<section id="review-changes-before-applying">
+<h2>Review changes before applying<a class="headerlink" href="#review-changes-before-applying" title="Link to this heading">¶</a></h2>
+<p>To see what would change without applying:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>copier<span class="w"> </span>update<span class="w"> </span>--trust<span class="w"> </span>--pretend
+</pre></div>
+</div>
+<p>This performs a dry run and shows the diff.</p>
+</section>
+<section id="resolve-conflicts">
+<h2>Resolve conflicts<a class="headerlink" href="#resolve-conflicts" title="Link to this heading">¶</a></h2>
+<p>When copier detects conflicts between your changes and template updates:</p>
+<ol class="arabic simple">
+<li><p>Copier creates <code class="docutils literal notranslate"><span class="pre">.rej</span></code> files containing the rejected hunks</p></li>
+<li><p>Review each <code class="docutils literal notranslate"><span class="pre">.rej</span></code> file and manually apply the intended changes</p></li>
+<li><p>Delete the <code class="docutils literal notranslate"><span class="pre">.rej</span></code> files after resolving</p></li>
+</ol>
+<p>Search for rejection files:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>find<span class="w"> </span>.<span class="w"> </span>-name<span class="w"> </span><span class="s2">&quot;*.rej&quot;</span>
+</pre></div>
+</div>
+</section>
+<section id="skip-specific-questions">
+<h2>Skip specific questions<a class="headerlink" href="#skip-specific-questions" title="Link to this heading">¶</a></h2>
+<p>If you want to keep specific answers unchanged and skip their prompts:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>copier<span class="w"> </span>update<span class="w"> </span>--trust<span class="w"> </span>--defaults
+</pre></div>
+</div>
+<p>This uses your previously saved answers (stored in <code class="docutils literal notranslate"><span class="pre">.copier-answers.yml</span></code>) without prompting.</p>
+</section>
+</section>
 
         </article>
       </div>
       <footer>
         
         <div class="related-pages">
-          
-          
+          <a class="next-page" href="reference-configuration.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">Configuration Variables Reference</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="howto-ci.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">How to Configure CI with GitHub Actions</div>
+                
+              </div>
+            </a>
         </div>
         <div class="bottom-of-page">
           <div class="left-details">
@@ -283,8 +347,32 @@
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">How to Update an Existing Project</a><ul>
+<li><a class="reference internal" href="#update-to-the-latest-template">Update to the latest template</a></li>
+<li><a class="reference internal" href="#update-to-a-specific-template-version">Update to a specific template version</a></li>
+<li><a class="reference internal" href="#change-configuration-options">Change configuration options</a></li>
+<li><a class="reference internal" href="#review-changes-before-applying">Review changes before applying</a></li>
+<li><a class="reference internal" href="#resolve-conflicts">Resolve conflicts</a></li>
+<li><a class="reference internal" href="#skip-specific-questions">Skip specific questions</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>
@@ -293,6 +381,5 @@
     <script src="_static/doctools.js?v=9bcbadda"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/scripts/furo.js?v=46bd48cc"></script>
-    
-    <script>DOCUMENTATION_OPTIONS.COLLAPSE_INDEX = true</script></body>
+    </body>
 </html>

@@ -2,10 +2,12 @@
 <html class="no-js" lang="en" data-content_root="./">
   <head><meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="genindex.html"><link rel="search" title="Search" href="search.html">
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="genindex.html"><link rel="search" title="Search" href="search.html"><link rel="next" title="How to Configure CI with GitHub Actions" href="howto-ci.html"><link rel="prev" title="Tutorial: Create Your First Python Project" href="tutorial.html">
 
-    <!-- Generated with Sphinx 8.2.3 and Furo 2025.12.19 --><title>Python Module Index - copier-py 0.0.0-post.35 documentation</title>
-<link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d111a655" />
+    <!-- Generated with Sphinx 8.2.3 and Furo 2025.12.19 -->
+        <title>How to Set Up Publishing to PyPI - copier-py 0.0.0-post.35 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=8dab3a3b" />
     
@@ -170,7 +172,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
       </label>
     </div>
@@ -193,8 +195,8 @@
 <li class="toctree-l1"><a class="reference internal" href="tutorial.html">Tutorial: Create Your First Python Project</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">How-to Guides</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="howto-publishing.html">How to Set Up Publishing to PyPI</a></li>
+<ul class="current">
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">How to Set Up Publishing to PyPI</a></li>
 <li class="toctree-l1"><a class="reference internal" href="howto-ci.html">How to Configure CI with GitHub Actions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="howto-update.html">How to Update an Existing Project</a></li>
 </ul>
@@ -225,7 +227,13 @@
           <span>Back to top</span>
         </a>
         <div class="content-icon-container">
-          <div class="theme-toggle-container theme-toggle-content">
+          <div class="view-this-page">
+  <a class="muted-link" href="_sources/howto-publishing.md.txt" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div>
+<div class="theme-toggle-container theme-toggle-content">
             <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
               <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
               <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
@@ -233,38 +241,143 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
             <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          
-<section class="domainindex-section">
-  <h1>Python Module Index</h1>
-  <div class="domainindex-jumpbox"><a href="#cap-c"><strong>c</strong></a></div>
+          <section class="tex2jax_ignore mathjax_ignore" id="how-to-set-up-publishing-to-pypi">
+<h1>How to Set Up Publishing to PyPI<a class="headerlink" href="#how-to-set-up-publishing-to-pypi" title="Link to this heading">¶</a></h1>
+<p>This guide covers configuring your generated project to publish packages to PyPI, TestPyPI, GitHub Packages, and GitHub Releases.</p>
+<section id="enable-publishing-during-generation">
+<h2>Enable publishing during generation<a class="headerlink" href="#enable-publishing-during-generation" title="Link to this heading">¶</a></h2>
+<p>When running <code class="docutils literal notranslate"><span class="pre">copier</span> <span class="pre">copy</span></code>, answer <code class="docutils literal notranslate"><span class="pre">yes</span></code> to the publishing questions:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>🎤 Publish to TestPyPI?
+   Yes
+🎤 Publish to PyPI?
+   Yes
+🎤 Publish to GitHub Packages?
+   Yes
+🎤 Attach artifacts to GitHub release?
+   Yes
+</pre></div>
+</div>
+<p>If you already generated your project, you can re-run copier to enable publishing — see below.</p>
 </section>
-<table class="domainindex-table">
-  <tr class="pcap">
-    <td></td><td>&#160;</td><td></td>
-  </tr>
-  <tr class="cap" id="cap-c">
-    <td></td><td><strong>c</strong></td><td></td>
-  </tr>
-  <tr>
-    <td></td>
-    <td>
-        <a href="sources/copier_py.html#module-copier_py"><code class="xref">copier_py</code></a></td><td>
-    <em></em></td>
-  </tr>
-</table>
+<section id="configure-pypi-trusted-publishing">
+<h2>Configure PyPI trusted publishing<a class="headerlink" href="#configure-pypi-trusted-publishing" title="Link to this heading">¶</a></h2>
+<p>The generated publish workflow uses <a class="reference external" href="https://docs.pypi.org/trusted-publishers/">trusted publishing</a> (OpenID Connect) — no API tokens needed.</p>
+<section id="for-pypi">
+<h3>For PyPI<a class="headerlink" href="#for-pypi" title="Link to this heading">¶</a></h3>
+<ol class="arabic simple">
+<li><p>Go to <a class="reference external" href="https://pypi.org">pypi.org</a> and create an account</p></li>
+<li><p>Navigate to <strong>Publishing</strong> → <strong>Add a new pending publisher</strong></p></li>
+<li><p>Fill in:</p>
+<ul class="simple">
+<li><p><strong>PyPI project name</strong>: your package name (e.g., <code class="docutils literal notranslate"><span class="pre">my-awesome-project</span></code>)</p></li>
+<li><p><strong>Owner</strong>: your GitHub username or organization</p></li>
+<li><p><strong>Repository name</strong>: your GitHub repository name</p></li>
+<li><p><strong>Workflow name</strong>: <code class="docutils literal notranslate"><span class="pre">publish.yml</span></code></p></li>
+<li><p><strong>Environment name</strong>: <code class="docutils literal notranslate"><span class="pre">publish_pypi</span></code></p></li>
+</ul>
+</li>
+<li><p>Click <strong>Add</strong></p></li>
+</ol>
+</section>
+<section id="for-testpypi">
+<h3>For TestPyPI<a class="headerlink" href="#for-testpypi" title="Link to this heading">¶</a></h3>
+<ol class="arabic simple">
+<li><p>Go to <a class="reference external" href="https://test.pypi.org">test.pypi.org</a> and create an account</p></li>
+<li><p>Navigate to <strong>Publishing</strong> → <strong>Add a new pending publisher</strong></p></li>
+<li><p>Fill in the same details but with:</p>
+<ul class="simple">
+<li><p><strong>Environment name</strong>: <code class="docutils literal notranslate"><span class="pre">publish_testpypi</span></code></p></li>
+</ul>
+</li>
+<li><p>Click <strong>Add</strong></p></li>
+</ol>
+</section>
+</section>
+<section id="configure-github-environments">
+<h2>Configure GitHub environments<a class="headerlink" href="#configure-github-environments" title="Link to this heading">¶</a></h2>
+<p>The publish workflow uses GitHub environments for deployment protection:</p>
+<ol class="arabic simple">
+<li><p>Go to your repository <strong>Settings</strong> → <strong>Environments</strong></p></li>
+<li><p>Create these environments as needed:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">publish_testpypi</span></code> — for TestPyPI publishing (triggered on push to main)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">publish_pypi</span></code> — for PyPI publishing (triggered on release)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">publish_github_packages</span></code> — for GitHub Packages (triggered on release)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">attach_to_github_release</span></code> — for release artifacts (triggered on release)</p></li>
+</ul>
+</li>
+<li><p>Optionally add required reviewers for production environments</p></li>
+</ol>
+</section>
+<section id="trigger-a-publish">
+<h2>Trigger a publish<a class="headerlink" href="#trigger-a-publish" title="Link to this heading">¶</a></h2>
+<section id="testpypi-on-every-push-to-main">
+<h3>TestPyPI (on every push to main)<a class="headerlink" href="#testpypi-on-every-push-to-main" title="Link to this heading">¶</a></h3>
+<p>TestPyPI publishing triggers automatically when you push to the <code class="docutils literal notranslate"><span class="pre">main</span></code> branch. Merge a PR or push directly:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>push<span class="w"> </span>origin<span class="w"> </span>main
+</pre></div>
+</div>
+</section>
+<section id="pypi-and-github-releases-on-release">
+<h3>PyPI and GitHub Releases (on release)<a class="headerlink" href="#pypi-and-github-releases-on-release" title="Link to this heading">¶</a></h3>
+<ol class="arabic simple">
+<li><p>Create a GitHub release using the release drafter:</p>
+<ul class="simple">
+<li><p>Go to <strong>Releases</strong> → <strong>Draft a new release</strong></p></li>
+<li><p>The release drafter pre-populates notes from merged PRs</p></li>
+<li><p>Choose a semantic version tag (e.g., <code class="docutils literal notranslate"><span class="pre">v1.0.0</span></code>)</p></li>
+<li><p>Click <strong>Publish release</strong></p></li>
+</ul>
+</li>
+<li><p>The publish workflow triggers automatically</p></li>
+</ol>
+</section>
+</section>
+<section id="re-run-copier-to-enable-publishing">
+<h2>Re-run copier to enable publishing<a class="headerlink" href="#re-run-copier-to-enable-publishing" title="Link to this heading">¶</a></h2>
+<p>If you generated your project without publishing enabled, re-run copier to add it:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>copier<span class="w"> </span>update<span class="w"> </span>/path/to/your-project
+</pre></div>
+</div>
+<p>Answer <code class="docutils literal notranslate"><span class="pre">yes</span></code> to the publishing questions you want to enable. Copier merges the new workflow configuration into your existing project.</p>
+</section>
+<section id="verify-the-workflow">
+<h2>Verify the workflow<a class="headerlink" href="#verify-the-workflow" title="Link to this heading">¶</a></h2>
+<p>Check the <strong>Actions</strong> tab in your GitHub repository to monitor workflow runs. Each publishing destination runs as a separate job with its own environment protection.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">build</span></code> job always runs regardless of publishing configuration — it builds the package and uploads artifacts to GitHub Actions for manual inspection.</p>
+</section>
+</section>
 
         </article>
       </div>
       <footer>
         
         <div class="related-pages">
-          
-          
+          <a class="next-page" href="howto-ci.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">How to Configure CI with GitHub Actions</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="tutorial.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">Tutorial: Create Your First Python Project</div>
+                
+              </div>
+            </a>
         </div>
         <div class="bottom-of-page">
           <div class="left-details">
@@ -283,8 +396,40 @@
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">How to Set Up Publishing to PyPI</a><ul>
+<li><a class="reference internal" href="#enable-publishing-during-generation">Enable publishing during generation</a></li>
+<li><a class="reference internal" href="#configure-pypi-trusted-publishing">Configure PyPI trusted publishing</a><ul>
+<li><a class="reference internal" href="#for-pypi">For PyPI</a></li>
+<li><a class="reference internal" href="#for-testpypi">For TestPyPI</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#configure-github-environments">Configure GitHub environments</a></li>
+<li><a class="reference internal" href="#trigger-a-publish">Trigger a publish</a><ul>
+<li><a class="reference internal" href="#testpypi-on-every-push-to-main">TestPyPI (on every push to main)</a></li>
+<li><a class="reference internal" href="#pypi-and-github-releases-on-release">PyPI and GitHub Releases (on release)</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#re-run-copier-to-enable-publishing">Re-run copier to enable publishing</a></li>
+<li><a class="reference internal" href="#verify-the-workflow">Verify the workflow</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>
@@ -293,6 +438,5 @@
     <script src="_static/doctools.js?v=9bcbadda"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/scripts/furo.js?v=46bd48cc"></script>
-    
-    <script>DOCUMENTATION_OPTIONS.COLLAPSE_INDEX = true</script></body>
+    </body>
 </html>
