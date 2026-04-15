@@ -26,6 +26,7 @@ RE_OBJ = re.compile(PATTERN)
 
 
 EXPECTED_BASE_BAKED_FILES = [
+    ".copier-answers.yml",
     ".commitlint.config.js",
     ".dockerignore",
     ".gitignore",
@@ -513,6 +514,20 @@ def test_publish_pypi_job_dependencies(
                 "[build] when TestPyPI is disabled"
             )
             pytest.fail(msg)
+
+
+def test_copier_answers_file(
+    tmp_path: Path, default_context: dict[str, str | bool]
+) -> None:
+    """Test .copier-answers.yml is generated with expected content."""
+    dest = generate_project(tmp_path, default_context)
+
+    answers_file = dest / ".copier-answers.yml"
+    assert answers_file.exists(), ".copier-answers.yml should exist"
+
+    content = answers_file.read_text(encoding="utf-8")
+    assert "_src_path:" in content, "Should contain _src_path key"
+    assert f"package_name: {default_context['package_name']}" in content
 
 
 @pytest.mark.parametrize("uv_version", ["8.0.8", "4.2.0"])
