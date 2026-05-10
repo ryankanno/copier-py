@@ -91,7 +91,7 @@ jobs:
             echo "TOX_COVERAGE_ENV=py$(echo ${MATRIX_PYTHON_VERSION} | cut -d . -f -2 | sed -e 's/\.//g')" >> $GITHUB_ENV
           fi
       - name: Upload to Codecov
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@v6
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: ./.tox/.coverage.coverage-${{ env.TOX_COVERAGE_ENV }}.xml
