@@ -27,7 +27,7 @@ RE_OBJ = re.compile(PATTERN)
 
 EXPECTED_BASE_BAKED_FILES = [
     ".copier-answers.yml",
-    ".commitlint.config.js",
+    "commitlint.config.mjs",
     ".dockerignore",
     ".gitignore",
     ".konchrc",
