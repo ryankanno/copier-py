@@ -78,7 +78,7 @@ supported_python_versions:
 
 uv_version:
   type: str
-  default: "0.7.3"
+  default: "0.10.9"
   help: "uv version"
 
 tox_version:
