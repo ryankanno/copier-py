@@ -22,7 +22,7 @@ All variables defined in `copier.yml` that are prompted during project generatio
 |----------|------|---------|-------------|
 | `python_version` | string | `"3.12"` | Primary Python version |
 | `supported_python_versions` | string | `"3.11, 3.12, 3.13, pypy3.11"` | Comma-separated list of supported Python versions. Allowed values: `3.11`, `3.12`, `3.13`, `pypy3.11`. |
-| `uv_version` | string | `"0.7.3"` | Version of uv to use |
+| `uv_version` | string | `"0.10.9"` | Version of uv to use |
 | `tox_version` | string | `"4.25.0"` | Version of tox to use |
 
 ## Sphinx theme
