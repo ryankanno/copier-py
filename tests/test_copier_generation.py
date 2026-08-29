@@ -823,5 +823,42 @@ def test_with_sphinx_theme(
                     )
 
 
+def test_dependabot_uses_uv_ecosystem(
+    tmp_path: Path, default_context: dict[str, str | bool]
+) -> None:
+    """Test dependabot.yml uses the uv and pre-commit ecosystems."""
+    dest = generate_project(tmp_path, default_context)
+
+    dependabot = dest / ".github" / "dependabot.yml"
+    assert dependabot.is_file(), "dependabot.yml should exist"
+
+    content = dependabot.read_text(encoding="utf-8")
+    settings = "\n".join(
+        line
+        for line in content.splitlines()
+        if not line.lstrip().startswith("#")
+    )
+
+    # The pip updater edits pyproject.toml without regenerating uv.lock,
+    # which breaks the `uv sync --locked` in every tox env.
+    assert 'package-ecosystem: "uv"' in settings, (
+        "dependabot.yml should use the uv ecosystem"
+    )
+    assert 'package-ecosystem: "pip"' not in settings, (
+        "dependabot.yml should not use the pip ecosystem"
+    )
+
+    # Hook revs drift independently of the pins in pyproject.toml, so
+    # without this ecosystem nothing updates them.
+    assert 'package-ecosystem: "pre-commit"' in settings, (
+        "dependabot.yml should cover pre-commit hook revs"
+    )
+
+    # `dependency-type` is pip-only, so it silently does nothing under uv.
+    assert "dependency-type:" not in settings, (
+        "dependency-type is unsupported in uv groups; use patterns instead"
+    )
+
+
 # vim: fenc=utf-8
 # vim: filetype=python
