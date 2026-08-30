@@ -113,10 +113,16 @@ def test_baked_project_docker_image(tmp_path: Path) -> None:
     # so this is the earliest point it can run at all.
     run(
         [
-            'docker', 'run', '--rm',
-            '--volume', f'{project}:/workspace',
-            '--workdir', '/workspace',
-            HADOLINT_IMAGE, 'hadolint', 'Dockerfile',
+            'docker',
+            'run',
+            '--rm',
+            '--volume',
+            f'{project}:/workspace',
+            '--workdir',
+            '/workspace',
+            HADOLINT_IMAGE,
+            'hadolint',
+            'Dockerfile',
         ],
         cwd=project,
     )
