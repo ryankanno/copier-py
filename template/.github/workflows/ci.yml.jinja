@@ -86,7 +86,10 @@ jobs:
         run: |
           MATRIX_PYTHON_VERSION={% raw %}${{matrix.python-version}}{% endraw %}
           echo "TOX_COVERAGE_ENV=py$(echo ${MATRIX_PYTHON_VERSION} | cut -d . -f -2 | sed -e 's/\.//g')" >> $GITHUB_ENV
+      # Dependabot PRs run without access to repository secrets, so
+      # CODECOV_TOKEN is empty and the upload fails the job.
       - name: Upload to Codecov
+        if: {% raw %}${{ github.actor != 'dependabot[bot]' }}{% endraw %}
         uses: codecov/codecov-action@v5
         with:
           token: {% raw %}${{ secrets.CODECOV_TOKEN }}{% endraw %}
