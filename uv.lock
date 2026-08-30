@@ -3,7 +3,7 @@ revision = 3
 requires-python = ">=3.11, <3.14"
 
 [options]
-exclude-newer = "2026-03-30T04:31:55.540925Z"
+exclude-newer = "0001-01-01T00:00:00Z" # This has no effect and is included for backwards compatibility when using relative exclude-newer values.
 exclude-newer-span = "P2W"
 
 [[package]]
@@ -272,13 +272,13 @@ requires-dist = [{ name = "copier", specifier = ">=9.7.1" }]
 dev = [
     { name = "binaryornot", specifier = ">=0.4.4,<0.5" },
     { name = "deptry", specifier = ">=0.23.0,<0.26" },
-    { name = "mypy", specifier = ">=1.15.0,<2" },
+    { name = "mypy", specifier = ">=1.15.0,<3" },
     { name = "pdbp", specifier = ">=1.7.1,<2" },
     { name = "pre-commit-uv", specifier = ">=4.1.4" },
     { name = "pytest", specifier = ">=8.3.5,<10" },
     { name = "pytest-cov", specifier = ">=6.1.1,<8" },
     { name = "pytest-xdist", specifier = ">=3.6.1,<4" },
-    { name = "ruff", specifier = ">=0.11.7,<0.16" },
+    { name = "ruff", specifier = ">=0.11.7,<0.17" },
     { name = "tox", specifier = ">=4.25.0,<5" },
     { name = "tox-uv", specifier = ">=1.21.5" },
 ]
