@@ -83,7 +83,7 @@ uv_version:
 
 tox_version:
   type: str
-  default: "4.25.0"
+  default: "4.60.0"
   help: "tox version"
 
 sphinx_theme:
