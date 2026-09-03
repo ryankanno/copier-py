@@ -291,7 +291,7 @@ dev = [
     { name = "deptry", specifier = ">=0.25.1,<0.26" },
     { name = "mypy", specifier = ">=2.3.1,<3" },
     { name = "pdbp", specifier = ">=1.7.1,<2" },
-    { name = "pre-commit-uv", specifier = ">=4.1.4" },
+    { name = "pre-commit-uv", specifier = ">=4.3.0" },
     { name = "pytest", specifier = ">=8.3.5,<10" },
     { name = "pytest-cov", specifier = ">=6.1.1,<8" },
     { name = "pytest-xdist", specifier = ">=3.6.1,<4" },
