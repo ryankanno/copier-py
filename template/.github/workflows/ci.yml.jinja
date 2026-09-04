@@ -90,7 +90,7 @@ jobs:
       # CODECOV_TOKEN is empty and the upload fails the job.
       - name: Upload to Codecov
         if: {% raw %}${{ github.actor != 'dependabot[bot]' }}{% endraw %}
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@v7
         with:
           token: {% raw %}${{ secrets.CODECOV_TOKEN }}{% endraw %}
           files: ./.tox/.coverage.coverage-{% raw %}${{ env.TOX_COVERAGE_ENV }}{% endraw %}.xml
