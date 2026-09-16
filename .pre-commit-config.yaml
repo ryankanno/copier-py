@@ -1,6 +1,6 @@
 repos:
   - repo: https://github.com/astral-sh/uv-pre-commit
-    rev: 0.12.5
+    rev: 0.12.8
     hooks:
       - id: uv-lock
   - repo: https://github.com/pre-commit/pre-commit-hooks
@@ -19,7 +19,7 @@ repos:
         exclude: ^template/
         additional_dependencies: [pytest>=9.1.1]
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.16.3
+    rev: v0.16.5
     hooks:
     - id: ruff-check
       args: ['--config', 'pyproject.toml']
@@ -54,7 +54,7 @@ repos:
         args: ['--baseline', '.secrets.baseline']
         exclude: ^template/
   - repo: https://github.com/crate-ci/typos
-    rev: v1.49.0
+    rev: v1.50.0
     hooks:
       - id: typos
         args: ["--config", "_typos.toml", "--force-exclude"]
