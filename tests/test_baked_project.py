@@ -35,6 +35,17 @@ REQUIRED_ANSWERS = {
     'project_url': 'https://github.com/ryankanno/foobar',
 }
 
+GIT_WITH_IDENTITY = [
+    'git',
+    '-c',
+    'user.name=test',
+    '-c',
+    'user.email=test@example.com',
+]
+
+# Width of `          ` before the script lines of a workflow step.
+STEP_SCRIPT_INDENT = 10
+
 
 def run(
     command: list[str], cwd: Path, check: bool = True
@@ -84,6 +95,87 @@ def bake_with_real_defaults(tmp_path: Path, **answers: str) -> Path:
         vcs_ref='HEAD',
     )
     return tmp_path
+
+
+def workflow_step_script(workflow: Path, name: str) -> str:
+    """The `run: |` script of the named step in a workflow file."""
+    lines = workflow.read_text(encoding='utf-8').splitlines()
+    step = f'      - name: {name}'
+    assert step in lines, f'{workflow.name} has no step named {name!r}'
+
+    after_step = lines[lines.index(step) :]
+    body = after_step[after_step.index('        run: |') + 1 :]
+
+    script = []
+    for line in body:
+        if line.strip() and not line.startswith(' ' * STEP_SCRIPT_INDENT):
+            break
+        script.append(line[STEP_SCRIPT_INDENT:])
+    return '\n'.join(script)
+
+
+def commit_and_push(checkout: Path, branch: str) -> None:
+    run(['git', 'add', '-A'], cwd=checkout)
+    run([*GIT_WITH_IDENTITY, 'commit', '-m', 'seed'], cwd=checkout)
+    run(['git', 'push', 'origin', branch], cwd=checkout)
+
+
+def clone_for_pages_deploy(tmp_path: Path, has_pages_branch: bool) -> Path:
+    """A clone of the default branch, as the deploy job's checkout makes."""
+    remote = tmp_path / 'remote.git'
+    seed = tmp_path / 'seed'
+    run(
+        ['git', 'init', '--bare', '--initial-branch=main', str(remote)],
+        cwd=tmp_path,
+    )
+    run(['git', 'clone', str(remote), str(seed)], cwd=tmp_path)
+
+    (seed / 'README.md').write_text('source\n', encoding='utf-8')
+    commit_and_push(seed, 'main')
+
+    if has_pages_branch:
+        run(['git', 'checkout', '--orphan', 'gh-pages'], cwd=seed)
+        run(['git', 'rm', '-rf', '--quiet', '.'], cwd=seed)
+        (seed / 'versions.json').write_text('[]\n', encoding='utf-8')
+        commit_and_push(seed, 'gh-pages')
+
+    checkout = tmp_path / 'checkout'
+    run(
+        ['git', 'clone', '--branch', 'main', str(remote), str(checkout)],
+        cwd=tmp_path,
+    )
+    return checkout
+
+
+@pytest.mark.parametrize('has_pages_branch', [False, True])
+def test_docs_deploy_starts_from_the_published_branch(
+    tmp_path: Path, has_pages_branch: bool
+) -> None:
+    project = bake_with_real_defaults(tmp_path / 'project')
+    checkout = clone_for_pages_deploy(tmp_path, has_pages_branch)
+
+    script = workflow_step_script(
+        project / '.github' / 'workflows' / 'docs.yml',
+        'Select gh-pages branch',
+    )
+    run(['bash', '-c', script], cwd=checkout)
+
+    branch = run(['git', 'branch', '--show-current'], cwd=checkout)
+    assert branch.stdout.strip() == 'gh-pages'
+
+    # Source files must never reach the published site.
+    assert not (checkout / 'README.md').exists()
+    assert (checkout / 'versions.json').exists() == has_pages_branch
+
+    (checkout / 'latest').mkdir()
+    (checkout / 'latest' / 'index.html').write_text('docs\n', encoding='utf-8')
+    commit_and_push(checkout, 'gh-pages')
+
+    published = run(
+        ['git', 'ls-remote', '--exit-code', '--heads', 'origin', 'gh-pages'],
+        cwd=checkout,
+    )
+    assert published.stdout
 
 
 @pytest.mark.bake

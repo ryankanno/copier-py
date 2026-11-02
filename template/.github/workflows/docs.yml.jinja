@@ -275,11 +275,22 @@ jobs:
           else
             echo "dir=latest" >> "$GITHUB_OUTPUT"
           fi
-      - name: Checkout gh-pages
+      - name: Checkout repository
         uses: actions/checkout@v7
         with:
-          ref: gh-pages
           path: gh-pages
+      # A new project has no gh-pages branch until its first deploy pushes one.
+      - name: Select gh-pages branch
+        shell: bash
+        working-directory: gh-pages
+        run: |
+          if git ls-remote --exit-code --heads origin gh-pages > /dev/null; then
+            git fetch --depth=1 origin gh-pages
+            git checkout -B gh-pages FETCH_HEAD
+          else
+            git checkout --orphan gh-pages
+            git rm -rf --quiet .
+          fi
       - name: Download docs artifact
         uses: actions/download-artifact@v8
         with:

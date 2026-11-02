@@ -127,7 +127,7 @@ project-root/
 | `hadolint.yml` | Push, PR | Dockerfile linting. |
 | `commitlint.yml` | PR | Validates commit messages against Conventional Commits. |
 | `trufflehog.yml` | Push, PR | Scans for leaked secrets. |
-| `docs.yml` | Push to main, pull request, release, manual | Builds Sphinx documentation and publishes each version to GitHub Pages. Needs a `gh-pages` branch and GitHub Actions as the Pages source. |
+| `docs.yml` | Push to main, pull request, release, manual | Builds Sphinx documentation and publishes each version to GitHub Pages. Needs GitHub Actions as the Pages source. |
 | `release-drafter.yml` | Push to main | Drafts release notes from merged PRs. |
 | `pr-size-labeling.yml` | PR | Adds size labels (XS, S, M, L, XL) to PRs. |
 | `pr-labeler.yml` | PR | Adds labels based on file paths changed. |

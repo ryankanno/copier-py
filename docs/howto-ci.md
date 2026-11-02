@@ -69,6 +69,12 @@ Some workflows require secrets. Add them in **Settings** → **Secrets and varia
 | `CODECOV_TOKEN` | CI workflow | Private repos with Codecov |
 | `PAT` | Auto-approve workflow | Dependabot auto-merge enabled |
 
+## Publish documentation to GitHub Pages
+
+The `docs` workflow publishes each version to GitHub Pages. It creates the `gh-pages` branch on the first deploy.
+
+Before the first push to `main`, go to **Settings** → **Pages** and set **Source** to **GitHub Actions**. Without this setting, the deploy job fails.
+
 ## Monitor workflow runs
 
 Check the **Actions** tab in your GitHub repository. Each workflow runs on its configured trigger:
