@@ -68,7 +68,7 @@ def run(
     return result
 
 
-def bake_with_real_defaults(tmp_path: Path) -> Path:
+def bake_with_real_defaults(tmp_path: Path, **answers: str) -> Path:
     """Generate a project using copier.yml's own defaults.
 
     Deliberately not the default_context fixture, which carries placeholder
@@ -78,12 +78,35 @@ def bake_with_real_defaults(tmp_path: Path) -> Path:
     run_copy(
         TEMPLATE_DIR,
         str(tmp_path),
-        data=REQUIRED_ANSWERS,
+        data={**REQUIRED_ANSWERS, **answers},
         defaults=True,
         unsafe=True,
         vcs_ref='HEAD',
     )
     return tmp_path
+
+
+@pytest.mark.bake
+@pytest.mark.parametrize(
+    'sphinx_theme',
+    [
+        'furo',
+        'sphinx-rtd-theme',
+        'sphinx-book-theme',
+        'pydata-sphinx-theme',
+        'sphinx-press-theme',
+        'piccolo-theme',
+        'sphinxawesome-theme',
+        'sphinx-wagtail-theme',
+    ],
+)
+def test_baked_project_resolves_with_theme(
+    tmp_path: Path, sphinx_theme: str
+) -> None:
+    project = bake_with_real_defaults(tmp_path, sphinx_theme=sphinx_theme)
+
+    # The theme lives in the docs group, which uv lock always resolves.
+    run(['uv', 'lock'], cwd=project)
 
 
 @pytest.mark.bake
