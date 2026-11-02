@@ -267,11 +267,15 @@ jobs:
       - name: Determine destination directory
         id: dest
         shell: bash
+        env:
+          EVENT_NAME: {% raw %}${{ github.event_name }}{% endraw %}
+          RELEASE_TAG: {% raw %}${{ github.event.release.tag_name }}{% endraw %}
+          INPUT_VERSION: {% raw %}${{ inputs.version }}{% endraw %}
         run: |
-          if [ "{% raw %}${{ github.event_name }}{% endraw %}" = "release" ]; then
-            echo "dir={% raw %}${{ github.event.release.tag_name }}{% endraw %}" >> "$GITHUB_OUTPUT"
-          elif [ "{% raw %}${{ github.event_name }}{% endraw %}" = "workflow_dispatch" ] && [ -n "{% raw %}${{ inputs.version }}{% endraw %}" ]; then
-            echo "dir={% raw %}${{ inputs.version }}{% endraw %}" >> "$GITHUB_OUTPUT"
+          if [ "$EVENT_NAME" = "release" ]; then
+            echo "dir=$RELEASE_TAG" >> "$GITHUB_OUTPUT"
+          elif [ "$EVENT_NAME" = "workflow_dispatch" ] && [ -n "$INPUT_VERSION" ]; then
+            echo "dir=$INPUT_VERSION" >> "$GITHUB_OUTPUT"
           else
             echo "dir=latest" >> "$GITHUB_OUTPUT"
           fi
@@ -284,7 +288,7 @@ jobs:
         shell: bash
         working-directory: gh-pages
         run: |
-          if git ls-remote --exit-code --heads origin gh-pages > /dev/null; then
+          if git ls-remote --exit-code origin refs/heads/gh-pages > /dev/null; then
             git fetch --depth=1 origin gh-pages
             git checkout -B gh-pages FETCH_HEAD
           else
@@ -298,8 +302,9 @@ jobs:
           path: ./artifact
       - name: Sync HTML into version directory
         shell: bash
+        env:
+          DEST: {% raw %}${{ steps.dest.outputs.dir }}{% endraw %}
         run: |
-          DEST="{% raw %}${{ steps.dest.outputs.dir }}{% endraw %}"
           rm -rf "gh-pages/${DEST}"
           mkdir -p "gh-pages/${DEST}"
           cp -a artifact/html_docs/. "gh-pages/${DEST}/"
@@ -315,7 +320,7 @@ jobs:
           import json, os, pathlib, re
 
           root = pathlib.Path(".")
-          version_re = re.compile(r"^\d+\.\d+\.\d+([._-].+)?$")
+          version_re = re.compile(r"^v?\d+\.\d+\.\d+([._-].+)?$")
           owner = os.environ["REPO_OWNER"]
           repo = os.environ["REPO_NAME"]
           base = f"https://{owner}.github.io/{repo}"
@@ -331,14 +336,14 @@ jobs:
           def sort_key(name: str):
               if name == "latest":
                   return (0, ())
-              parts = re.split(r"[._-]", name)
-              nums = []
-              for part in parts:
-                  try:
-                      nums.append(int(part))
-                  except ValueError:
-                      nums.append(part)
-              return (1, tuple(-n if isinstance(n, int) else n for n in nums))
+              parts = re.split(r"[._-]", name.removeprefix("v"))
+              return (
+                  1,
+                  tuple(
+                      (0, -int(part), "") if part.isdigit() else (1, 0, part)
+                      for part in parts
+                  ),
+              )
 
           entries.sort(key=sort_key)
           payload = [
@@ -350,6 +355,8 @@ jobs:
       - name: Commit and push gh-pages branch
         shell: bash
         working-directory: gh-pages
+        env:
+          DEST: {% raw %}${{ steps.dest.outputs.dir }}{% endraw %}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -357,7 +364,7 @@ jobs:
           if git diff --cached --quiet; then
             echo "No gh-pages changes to publish."
           else
-            git commit -m "deploy: {% raw %}${{ steps.dest.outputs.dir }} from ${GITHUB_SHA}{% endraw %}"
+            git commit -m "deploy: ${DEST} from ${GITHUB_SHA}"
             git push origin gh-pages
           fi
       - name: Stage Pages payload

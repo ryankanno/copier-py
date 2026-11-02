@@ -6,6 +6,7 @@
 
 """Runs a generated project end to end."""
 
+import json
 import os
 import shutil
 import subprocess
@@ -148,6 +149,9 @@ def clone_for_pages_deploy(tmp_path: Path, has_pages_branch: bool) -> Path:
     (seed / 'README.md').write_text('source\n', encoding='utf-8')
     commit_and_push(seed, 'main')
 
+    # Shares a suffix with gh-pages, so it must not count as that branch.
+    run(['git', 'push', 'origin', 'main:docs/gh-pages'], cwd=seed)
+
     if has_pages_branch:
         run(['git', 'checkout', '--orphan', 'gh-pages'], cwd=seed)
         run(['git', 'rm', '-rf', '--quiet', '.'], cwd=seed)
@@ -192,6 +196,66 @@ def test_docs_deploy_starts_from_the_published_branch(
         cwd=checkout,
     )
     assert published.stdout
+
+
+@pytest.mark.bake
+def test_docs_deploy_lists_every_published_version(tmp_path: Path) -> None:
+    project = bake_with_real_defaults(tmp_path / 'project')
+    pages = tmp_path / 'pages'
+    for name in (
+        'latest',
+        'v1.2.3',
+        'v1.10.0',
+        '1.2.3-1',
+        '1.2.3-rc1',
+        '_static',
+    ):
+        (pages / name).mkdir(parents=True)
+
+    script = workflow_step_script(
+        project / '.github' / 'workflows' / 'docs.yml',
+        'Regenerate versions.json',
+    )
+    run(
+        ['env', 'REPO_OWNER=acme', 'REPO_NAME=foo', 'bash', '-c', script],
+        cwd=pages,
+    )
+
+    versions = json.loads((pages / 'versions.json').read_text('utf-8'))
+    assert [version['name'] for version in versions] == [
+        'latest',
+        'v1.10.0',
+        'v1.2.3',
+        '1.2.3-1',
+        '1.2.3-rc1',
+    ]
+
+
+@pytest.mark.bake
+def test_docs_deploy_treats_the_version_input_as_data(tmp_path: Path) -> None:
+    project = bake_with_real_defaults(tmp_path / 'project')
+    output = tmp_path / 'github_output'
+    version = 'x"; touch injected; echo "'
+
+    script = workflow_step_script(
+        project / '.github' / 'workflows' / 'docs.yml',
+        'Determine destination directory',
+    )
+    run(
+        [
+            'env',
+            'EVENT_NAME=workflow_dispatch',
+            f'INPUT_VERSION={version}',
+            f'GITHUB_OUTPUT={output}',
+            'bash',
+            '-c',
+            script,
+        ],
+        cwd=tmp_path,
+    )
+
+    assert not (tmp_path / 'injected').exists()
+    assert output.read_text(encoding='utf-8') == f'dir={version}\n'
 
 
 @pytest.mark.bake
