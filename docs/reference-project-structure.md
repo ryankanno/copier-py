@@ -35,6 +35,7 @@ project-root/
 ├── docs/
 │   ├── Makefile
 │   ├── _static/
+│   │   ├── .keep
 │   │   ├── version-switcher.css
 │   │   └── version-switcher.js
 │   ├── _templates/
@@ -101,7 +102,7 @@ project-root/
 | Path | Description |
 |------|-------------|
 | `docs/conf.py` | Sphinx configuration with selected theme and MyST parser. |
-| `docs/_static/version-switcher.*` | Version selector script and styles for the `furo` and `sphinx-rtd-theme` themes. |
+| `docs/_static/version-switcher.*` | Version selector script and styles. Generated for every theme, but only `furo` and `sphinx-rtd-theme` load them. |
 | `docs/_templates/sidebar/version-selector.html` | Version selector markup for the `furo` sidebar. |
 | `docs/index.rst` | Documentation root page with toctree. |
 | `docs/getting_started/` | Getting started documentation section. |

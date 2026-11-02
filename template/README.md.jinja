@@ -53,6 +53,16 @@ uv sync
 ```
 This also generates `uv.lock`. Commit it before your first push, since CI
 resolves dependencies with `uv sync --locked` and fails without it.
+{%- if should_install_github_actions %}
+
+### Documentation
+
+Before the first push to `main`, set these two GitHub repository settings:
+
+1. In **Settings** → **Pages**, set **Source** to **GitHub Actions**.
+2. In **Settings** → **Environments** → **github-pages**, add a `v*` tag rule
+under **Deployment branches and tags**. Without it, release deploys fail.
+{%- endif %}
 
 <!-- USAGE EXAMPLES -->
 ## 🛠️ Usage
