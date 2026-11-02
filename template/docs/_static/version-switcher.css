@@ -54,6 +54,7 @@
 
 /* sphinx-rtd-theme variant */
 .sidebar-version-selector--rtd {
+  margin: 0;
   padding: 0 1rem 0.75rem;
   font-size: 0.85em;
   color: #d9d9d9;

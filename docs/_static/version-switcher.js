@@ -1,11 +1,14 @@
 (function () {
   "use strict";
 
+  // Matches the directories the docs workflow publishes.
+  const VERSION_RE = /^(latest|v?\d+\.\d+\.\d+([._-].+)?)$/;
+
   function detectCurrentVersion() {
     const segments = window.location.pathname.split("/").filter(Boolean);
     // GH pages serves at /<repo>/<version>/...
     // index 0 is the repo name, index 1 is the version slug.
-    if (segments.length >= 2) {
+    if (segments.length >= 2 && VERSION_RE.test(segments[1])) {
       return segments[1];
     }
     return "";
@@ -27,7 +30,11 @@
     }
     const tail = segments.slice(2).join("/");
     const suffix = tail ? "/" + tail : "/";
-    window.location.pathname = "/" + segments[0] + "/" + slug + suffix;
+    window.location.assign(
+      "/" + segments[0] + "/" + slug + suffix +
+        window.location.search +
+        window.location.hash
+    );
   }
 
   function populate(select, entries, current) {

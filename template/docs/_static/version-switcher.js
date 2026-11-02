@@ -1,6 +1,9 @@
 (function () {
   "use strict";
 
+  // Matches the directories the docs workflow lists in versions.json.
+  const VERSION_RE = /^(latest|v?\d+\.\d+\.\d+([._-].+)?)$/;
+
   function detectTheme() {
     if (document.querySelector(".sidebar-drawer")) return "furo";
     if (document.querySelector(".wy-side-nav-search")) return "rtd";
@@ -9,7 +12,7 @@
 
   function detectCurrentVersion() {
     const segments = window.location.pathname.split("/").filter(Boolean);
-    if (segments.length >= 2) {
+    if (segments.length >= 2 && VERSION_RE.test(segments[1])) {
       return segments[1];
     }
     return "";
@@ -31,7 +34,11 @@
     }
     const tail = segments.slice(2).join("/");
     const suffix = tail ? "/" + tail : "/";
-    window.location.pathname = "/" + segments[0] + "/" + slug + suffix;
+    window.location.assign(
+      "/" + segments[0] + "/" + slug + suffix +
+        window.location.search +
+        window.location.hash
+    );
   }
 
   function ensureDropdownExists(theme) {
@@ -48,7 +55,6 @@
     const select = document.createElement("select");
     select.id = "cc-version-select";
     select.className = "sidebar-version-selector__select";
-    select.setAttribute("aria-label", "Select documentation version");
     const placeholder = document.createElement("option");
     placeholder.value = "";
     placeholder.textContent = "loading…";
