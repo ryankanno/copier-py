@@ -6,6 +6,7 @@
 
 """Tests project generation."""
 
+import configparser
 import logging
 import mmap
 import os
@@ -1016,6 +1017,18 @@ def test_docs_copyright_carries_the_build_commit(
     conf = load_docs_conf(dest, monkeypatch)
 
     assert conf["copyright"].endswith(" · build aaaaaaa")
+
+
+def test_docs_tox_env_receives_the_published_version(
+    tmp_path: Path, default_context: dict[str, str | bool]
+) -> None:
+    """Test tox hands the workflow's version to the pydata switcher."""
+    dest = generate_project(tmp_path, default_context)
+
+    tox_ini = configparser.ConfigParser(interpolation=None)
+    tox_ini.read(dest / "tox.ini", encoding="utf-8")
+
+    assert "DOCS_VERSION_MATCH" in tox_ini["testenv:docs"].get("pass_env", "")
 
 
 def test_docs_workflow_publishes_versioned_docs(
