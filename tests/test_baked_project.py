@@ -9,10 +9,13 @@
 import os
 import shutil
 import subprocess
+from itertools import takewhile
 from pathlib import Path
 
 import pytest
 from copier import run_copy
+
+from tests.test_copier_generation import THIRD_PARTY_SPHINX_THEMES
 
 
 TEMPLATE_DIR = str(Path(__file__).parent.parent)
@@ -42,6 +45,9 @@ GIT_WITH_IDENTITY = [
     '-c',
     'user.email=test@example.com',
 ]
+
+# Width of `        ` before the keys of a workflow step.
+STEP_INDENT = 8
 
 # Width of `          ` before the script lines of a workflow step.
 STEP_SCRIPT_INDENT = 10
@@ -103,8 +109,17 @@ def workflow_step_script(workflow: Path, name: str) -> str:
     step = f'      - name: {name}'
     assert step in lines, f'{workflow.name} has no step named {name!r}'
 
-    after_step = lines[lines.index(step) :]
-    body = after_step[after_step.index('        run: |') + 1 :]
+    after_step = lines[lines.index(step) + 1 :]
+    step_lines = list(
+        takewhile(
+            lambda line: (
+                not line.strip() or line.startswith(' ' * STEP_INDENT)
+            ),
+            after_step,
+        )
+    )
+    assert '        run: |' in step_lines, f'step {name!r} has no run script'
+    body = step_lines[step_lines.index('        run: |') + 1 :]
 
     script = []
     for line in body:
@@ -147,6 +162,7 @@ def clone_for_pages_deploy(tmp_path: Path, has_pages_branch: bool) -> Path:
     return checkout
 
 
+@pytest.mark.bake
 @pytest.mark.parametrize('has_pages_branch', [False, True])
 def test_docs_deploy_starts_from_the_published_branch(
     tmp_path: Path, has_pages_branch: bool
@@ -179,19 +195,7 @@ def test_docs_deploy_starts_from_the_published_branch(
 
 
 @pytest.mark.bake
-@pytest.mark.parametrize(
-    'sphinx_theme',
-    [
-        'furo',
-        'sphinx-rtd-theme',
-        'sphinx-book-theme',
-        'pydata-sphinx-theme',
-        'sphinx-press-theme',
-        'piccolo-theme',
-        'sphinxawesome-theme',
-        'sphinx-wagtail-theme',
-    ],
-)
+@pytest.mark.parametrize('sphinx_theme', THIRD_PARTY_SPHINX_THEMES)
 def test_baked_project_resolves_with_theme(
     tmp_path: Path, sphinx_theme: str
 ) -> None:

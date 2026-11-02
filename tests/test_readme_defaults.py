@@ -17,7 +17,7 @@ REPO_ROOT = Path(__file__).parent.parent
 # Matches "- `option_name` - description (default: value)" in the README's
 # template options list.
 DOCUMENTED_DEFAULT = re.compile(
-    r"`(?P<option>[a-z_]+)` - [^(\n]*\(default: (?P<value>[^)]+)\)"
+    r"`(?P<option>[a-z_]+)` - [^\n]*?\(default: (?P<value>[^)]+)\)"
 )
 
 

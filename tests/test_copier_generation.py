@@ -1054,10 +1054,13 @@ def test_repo_docs_render_the_version_selector(
 ) -> None:
     """Test this repo's own docs expose the versions they publish."""
     repo = Path(TEMPLATE_DIR)
+    monkeypatch.setenv("GITHUB_SHA", "a" * 40)
 
     conf = load_docs_conf(repo, monkeypatch)
 
+    assert conf["html_css_files"] == ["version-switcher.css"]
     assert conf["html_js_files"] == ["version-switcher.js"]
+    assert conf["project_copyright"].endswith(" · build aaaaaaa")
     assert "sidebar/version-selector.html" in conf["html_sidebars"]["**"]
     assert (repo / "docs" / "_static" / "version-switcher.js").is_file()
     assert (repo / "docs" / "_static" / "version-switcher.css").is_file()
