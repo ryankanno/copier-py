@@ -92,4 +92,4 @@ tox *TOX_ARGS:
 
 # Runs watchexec
 watch *JUST_RECIPE:
-    watchexec -r -e py -- "just {{ JUST_RECIPE }} && toastify send '🚀 just {{ JUST_RECIPE }}' 'just {{ JUST_RECIPE }} was successful' || toastify send '❌ just {{ JUST_RECIPE }}' '{{ JUST_RECIPE }} failed'"
+    watchexec -r -e py,jinja,yml,yaml,ini,md,rst -- "just {{ JUST_RECIPE }} && (toastify send '🚀 just {{ JUST_RECIPE }}' 'just {{ JUST_RECIPE }} was successful' || true) || (toastify send '❌ just {{ JUST_RECIPE }}' '{{ JUST_RECIPE }} failed' || true)"
