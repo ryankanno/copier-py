@@ -103,7 +103,7 @@ project-root/
 |------|-------------|
 | `docs/conf.py` | Sphinx configuration with selected theme and MyST parser. |
 | `docs/_static/version-switcher.*` | Version selector script and styles. Generated for every theme, but only `furo` and `sphinx-rtd-theme` load them. |
-| `docs/_templates/sidebar/version-selector.html` | Version selector markup for the `furo` sidebar. |
+| `docs/_templates/sidebar/version-selector.html` | Version selector markup for the `furo` sidebar. Generated for every theme, but only `furo` uses it. |
 | `docs/index.rst` | Documentation root page with toctree. |
 | `docs/getting_started/` | Getting started documentation section. |
 | `docs/usage/` | Usage documentation section. |

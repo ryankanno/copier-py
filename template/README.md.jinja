@@ -60,8 +60,10 @@ resolves dependencies with `uv sync --locked` and fails without it.
 Before the first push to `main`, set these two GitHub repository settings:
 
 1. In **Settings** → **Pages**, set **Source** to **GitHub Actions**.
-2. In **Settings** → **Environments** → **github-pages**, add a `v*` tag rule
-under **Deployment branches and tags**. Without it, release deploys fail.
+2. In **Settings** → **Environments** → **github-pages**, add a tag rule that
+matches your release tags, such as `v*`, under **Deployment branches and
+tags**. Create the environment if it is not listed. Without the rule, release
+deploys fail.
 {%- endif %}
 
 <!-- USAGE EXAMPLES -->

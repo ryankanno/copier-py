@@ -76,14 +76,14 @@ The `docs` workflow publishes each version to `<owner>.github.io/<repo>/<version
 Before the first push to `main`:
 
 1. Go to **Settings** → **Pages** and set **Source** to **GitHub Actions**. Without this setting, the deploy job fails.
-2. Go to **Settings** → **Environments** → **github-pages**. Under **Deployment branches and tags**, add a tag rule for `v*`. Without this rule, GitHub rejects deploys from releases.
+2. Go to **Settings** → **Environments** → **github-pages**. If it is not listed, select **New environment** and name it `github-pages`. Under **Deployment branches and tags**, add a tag rule that matches your release tags, such as `v*`. Without this rule, GitHub rejects deploys from releases.
 
 A push to `main` publishes to `latest`. A release publishes to a directory named after its tag. The version selector lists `latest` and tags such as `1.2.3` or `v1.2.3`. Pull request runs build the docs and skip the deploy job.
 
 To backfill a released version, run the workflow manually with **Run workflow**:
 
 - `ref`: the branch, tag, or SHA to build. The default is the branch that you run the workflow from.
-- `version`: the destination directory, such as `v1.2.3`. The default is `latest`.
+- `version`: the destination directory, such as `v1.2.3`. Set it for a backfill, because the default is `latest`. The deploy fails for a name other than `latest` or a version such as `1.2.3` or `v1.2.3-rc1`.
 
 A run from a tag or from a branch other than the default also needs an allowed rule in the `github-pages` environment.
 
