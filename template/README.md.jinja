@@ -62,8 +62,8 @@ Before the first push to `main`, set these two GitHub repository settings:
 1. In **Settings** → **Pages**, set **Source** to **GitHub Actions**.
 2. In **Settings** → **Environments** → **github-pages**, add a tag rule that
 matches your release tags, such as `v*`, under **Deployment branches and
-tags**. Create the environment if it is not listed. Without the rule, release
-deploys fail.
+tags**. Create the environment if it is not listed, and then also add a branch
+rule for `main`. Without these rules, deploys fail.
 {%- endif %}
 
 <!-- USAGE EXAMPLES -->
