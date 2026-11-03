@@ -245,8 +245,8 @@ def determine_destination(
         [
             'env',
             f'EVENT_NAME={event}',
-            f'RELEASE_TAG={version}',
-            f'INPUT_VERSION={version}',
+            f'RELEASE_TAG={version if event == "release" else ""}',
+            f'INPUT_VERSION={version if event == "workflow_dispatch" else ""}',
             f'GITHUB_OUTPUT={tmp_path / "github_output"}',
             'bash',
             '-c',
