@@ -82,16 +82,14 @@ jobs:
         if: |
           steps.wait-for-status-checks.outputs.status == 'success' &&
           steps.dependabot-metadata.outputs.update-type != 'version-update:semver-major'
-        id: automerge
-        uses: "pascalgn/automerge-action@v0.16.4"
         env:
-          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
-          MERGE_LABELS: "automerge,!major"
-          MERGE_REMOVE_LABELS: ""
-          MERGE_METHOD: "squash"
-          MERGE_COMMIT_MESSAGE: "pull-request-title-and-description"
-          MERGE_FORKS: "false"
-          MERGE_RETRIES: "6"
-          MERGE_RETRY_SLEEP: "30000"
-          MERGE_REQUIRED_APPROVALS: "1"
-          UPDATE_METHOD: "rebase"
+          GH_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+          PR_URL: "${{ github.event.pull_request.html_url }}"
+        # dependabot.yml labels only the ecosystems that opt in with "automerge".
+        run: |
+          labels=$(gh pr view "$PR_URL" --json labels --jq '.labels[].name')
+          if ! grep -qx automerge <<< "$labels" || grep -qx major <<< "$labels"; then
+            echo "Not labeled automerge, or labeled major; leaving it open."
+            exit 0
+          fi
+          gh pr merge "$PR_URL" --squash --body "$(gh pr view "$PR_URL" --json body --jq .body)"
