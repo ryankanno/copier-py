@@ -208,6 +208,7 @@ def test_docs_deploy_lists_every_published_version(tmp_path: Path) -> None:
         'v1.10.0',
         '1.2.3-1',
         '1.2.3-rc1',
+        '1.2.3-²',
         '_static',
     ):
         (pages / name).mkdir(parents=True)
@@ -228,34 +229,75 @@ def test_docs_deploy_lists_every_published_version(tmp_path: Path) -> None:
         'v1.2.3',
         '1.2.3-1',
         '1.2.3-rc1',
+        '1.2.3-²',
     ]
 
 
-@pytest.mark.bake
-def test_docs_deploy_treats_the_version_input_as_data(tmp_path: Path) -> None:
+def determine_destination(
+    tmp_path: Path, event: str, version: str
+) -> subprocess.CompletedProcess[str]:
     project = bake_with_real_defaults(tmp_path / 'project')
-    output = tmp_path / 'github_output'
-    version = 'x"; touch injected; echo "'
-
     script = workflow_step_script(
         project / '.github' / 'workflows' / 'docs.yml',
         'Determine destination directory',
     )
-    run(
+    return run(
         [
             'env',
-            'EVENT_NAME=workflow_dispatch',
+            f'EVENT_NAME={event}',
+            f'RELEASE_TAG={version}',
             f'INPUT_VERSION={version}',
-            f'GITHUB_OUTPUT={output}',
+            f'GITHUB_OUTPUT={tmp_path / "github_output"}',
             'bash',
             '-c',
             script,
         ],
         cwd=tmp_path,
+        check=False,
     )
 
+
+@pytest.mark.bake
+@pytest.mark.parametrize(
+    ('event', 'version', 'directory'),
+    [
+        ('push', '', 'latest'),
+        ('workflow_dispatch', '', 'latest'),
+        ('workflow_dispatch', 'v1.2.3', 'v1.2.3'),
+        ('release', '1.2.3-rc1', '1.2.3-rc1'),
+    ],
+)
+def test_docs_deploy_picks_the_version_directory(
+    tmp_path: Path, event: str, version: str, directory: str
+) -> None:
+    result = determine_destination(tmp_path, event, version)
+
+    assert result.returncode == 0, result.stderr
+    output = tmp_path / 'github_output'
+    assert output.read_text(encoding='utf-8') == f'dir={directory}\n'
+
+
+@pytest.mark.bake
+@pytest.mark.parametrize(
+    ('event', 'version'),
+    [
+        ('workflow_dispatch', 'x"; touch injected; echo "'),
+        ('workflow_dispatch', 'stable'),
+        ('workflow_dispatch', '.git'),
+        ('workflow_dispatch', '../artifact'),
+        ('workflow_dispatch', '1.2.3-/../../.git'),
+        ('workflow_dispatch', '1.2.3\nextra=1'),
+        ('release', '../artifact'),
+    ],
+)
+def test_docs_deploy_refuses_a_version_it_cannot_list(
+    tmp_path: Path, event: str, version: str
+) -> None:
+    result = determine_destination(tmp_path, event, version)
+
+    assert result.returncode != 0
     assert not (tmp_path / 'injected').exists()
-    assert output.read_text(encoding='utf-8') == f'dir={version}\n'
+    assert not (tmp_path / 'github_output').exists()
 
 
 @pytest.mark.bake

@@ -273,12 +273,18 @@ jobs:
           INPUT_VERSION: {% raw %}${{ inputs.version }}{% endraw %}
         run: |
           if [ "$EVENT_NAME" = "release" ]; then
-            echo "dir=$RELEASE_TAG" >> "$GITHUB_OUTPUT"
+            dir="$RELEASE_TAG"
           elif [ "$EVENT_NAME" = "workflow_dispatch" ] && [ -n "$INPUT_VERSION" ]; then
-            echo "dir=$INPUT_VERSION" >> "$GITHUB_OUTPUT"
+            dir="$INPUT_VERSION"
           else
-            echo "dir=latest" >> "$GITHUB_OUTPUT"
+            dir=latest
           fi
+          # The deploy deletes and rewrites this directory, and versions.json lists only these names.
+          if [[ ! "$dir" =~ ^(latest|v?[0-9]+\.[0-9]+\.[0-9]+([._-][A-Za-z0-9._-]+)?)$ ]]; then
+            echo "::error::The version must be latest or look like v1.2.3 or 1.2.3-rc1."
+            exit 1
+          fi
+          echo "dir=$dir" >> "$GITHUB_OUTPUT"
       - name: Checkout repository
         uses: actions/checkout@v7
         with:
@@ -340,7 +346,7 @@ jobs:
               return (
                   1,
                   tuple(
-                      (0, -int(part), "") if part.isdigit() else (1, 0, part)
+                      (0, -int(part), "") if part.isdecimal() else (1, 0, part)
                       for part in parts
                   ),
               )
