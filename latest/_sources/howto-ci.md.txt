@@ -69,6 +69,26 @@ Some workflows require secrets. Add them in **Settings** → **Secrets and varia
 | `CODECOV_TOKEN` | CI workflow | Private repos with Codecov |
 | `PAT` | Auto-approve workflow | Dependabot auto-merge enabled |
 
+## Publish documentation to GitHub Pages
+
+The `docs` workflow publishes each version to `<owner>.github.io/<repo>/<version>/`. It creates the `gh-pages` branch on the first deploy.
+
+Before the first push to `main`:
+
+1. Go to **Settings** → **Pages** and set **Source** to **GitHub Actions**. Without this setting, the deploy job fails.
+2. Go to **Settings** → **Environments** → **github-pages**. If it is not listed, select **New environment** and name it `github-pages`. Under **Deployment branches and tags**, add a tag rule that matches your release tags, such as `v*`. Without this rule, GitHub rejects deploys from releases. Make sure the rules also allow `main`, because a new environment has no branch rule.
+
+A push to `main` publishes to `latest`. A release publishes to a directory named after its tag. The version selector lists `latest` and tags such as `1.2.3` or `v1.2.3`. Pull request runs build the docs and skip the deploy job.
+
+To backfill a released version, run the workflow manually with **Run workflow**:
+
+- `ref`: the branch, tag, or SHA to build. The default is the branch that you run the workflow from.
+- `version`: the destination directory, such as `v1.2.3`. Set it for a backfill, because the default is `latest`.
+
+The deploy accepts only `latest` or a version such as `1.2.3`, `v1.2.3`, or `v1.2.3-rc1`. This applies to release tags too, so a release tagged `1.2` fails its docs deploy.
+
+A run from a tag or from a branch other than the default also needs an allowed rule in the `github-pages` environment.
+
 ## Monitor workflow runs
 
 Check the **Actions** tab in your GitHub repository. Each workflow runs on its configured trigger:
@@ -76,4 +96,4 @@ Check the **Actions** tab in your GitHub repository. Each workflow runs on its c
 - **CI**: runs on every push and pull request
 - **CodeQL**: runs on push to main and on a weekly schedule
 - **Publish**: runs on push to main (TestPyPI) and on release (PyPI)
-- **Docs**: runs on push to main and on release
+- **Docs**: runs on push to main, on pull requests, on release, and on manual dispatch

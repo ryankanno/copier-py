@@ -6,10 +6,11 @@
 <link rel="index" title="Index" href="genindex.html"><link rel="search" title="Search" href="search.html"><link rel="next" title="How to Update an Existing Project" href="howto-update.html"><link rel="prev" title="How to Set Up Publishing to PyPI" href="howto-publishing.html">
 
     <!-- Generated with Sphinx 9.0.4 and Furo 2025.12.19 -->
-        <title>How to Configure CI with GitHub Actions - copier-py 0.0.0-post.62 documentation</title>
+        <title>How to Configure CI with GitHub Actions - copier-py 0.0.0-post.63 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=8dab3a3b" />
+    <link rel="stylesheet" type="text/css" href="_static/version-switcher.css?v=fd4188a6" />
     
     
 
@@ -161,7 +162,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="index.html"><div class="brand">copier-py 0.0.0-post.62 documentation</div></a>
+      <a href="index.html"><div class="brand">copier-py 0.0.0-post.63 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -182,7 +183,7 @@
       
       <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
   
-  <span class="sidebar-brand-text">copier-py 0.0.0-post.62 documentation</span>
+  <span class="sidebar-brand-text">copier-py 0.0.0-post.63 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -211,6 +212,11 @@
 </ul>
 
 </div>
+</div><div class="sidebar-version-selector">
+  <label for="cc-version-select" class="sidebar-version-selector__label">Version</label>
+  <select id="cc-version-select" class="sidebar-version-selector__select">
+    <option value="">loading…</option>
+  </select>
 </div>
 
       </div>
@@ -228,12 +234,16 @@
         </a>
         <div class="content-icon-container">
           <div class="view-this-page">
-  <a class="muted-link" href="_sources/howto-ci.md.txt" title="View this page">
+  <a class="muted-link" href="https://github.com/ryankanno/copier-py/blob/main/docs/howto-ci.md?plain=true" title="View this page">
     <svg><use href="#svg-eye"></use></svg>
     <span class="visually-hidden">View this page</span>
   </a>
-</div>
-<div class="theme-toggle-container theme-toggle-content">
+</div><div class="edit-this-page">
+  <a class="muted-link" href="https://github.com/ryankanno/copier-py/edit/main/docs/howto-ci.md" rel="edit" title="Edit this page">
+    <svg><use href="#svg-pencil"></use></svg>
+    <span class="visually-hidden">Edit this page</span>
+  </a>
+</div><div class="theme-toggle-container theme-toggle-content">
             <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
               <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
               <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
@@ -334,6 +344,23 @@ git<span class="w"> </span>tag<span class="w"> </span>patch<span class="w"> </sp
 </table>
 </div>
 </section>
+<section id="publish-documentation-to-github-pages">
+<h2>Publish documentation to GitHub Pages<a class="headerlink" href="#publish-documentation-to-github-pages" title="Link to this heading">¶</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">docs</span></code> workflow publishes each version to <code class="docutils literal notranslate"><span class="pre">&lt;owner&gt;.github.io/&lt;repo&gt;/&lt;version&gt;/</span></code>. It creates the <code class="docutils literal notranslate"><span class="pre">gh-pages</span></code> branch on the first deploy.</p>
+<p>Before the first push to <code class="docutils literal notranslate"><span class="pre">main</span></code>:</p>
+<ol class="arabic simple">
+<li><p>Go to <strong>Settings</strong> → <strong>Pages</strong> and set <strong>Source</strong> to <strong>GitHub Actions</strong>. Without this setting, the deploy job fails.</p></li>
+<li><p>Go to <strong>Settings</strong> → <strong>Environments</strong> → <strong>github-pages</strong>. If it is not listed, select <strong>New environment</strong> and name it <code class="docutils literal notranslate"><span class="pre">github-pages</span></code>. Under <strong>Deployment branches and tags</strong>, add a tag rule that matches your release tags, such as <code class="docutils literal notranslate"><span class="pre">v*</span></code>. Without this rule, GitHub rejects deploys from releases. Make sure the rules also allow <code class="docutils literal notranslate"><span class="pre">main</span></code>, because a new environment has no branch rule.</p></li>
+</ol>
+<p>A push to <code class="docutils literal notranslate"><span class="pre">main</span></code> publishes to <code class="docutils literal notranslate"><span class="pre">latest</span></code>. A release publishes to a directory named after its tag. The version selector lists <code class="docutils literal notranslate"><span class="pre">latest</span></code> and tags such as <code class="docutils literal notranslate"><span class="pre">1.2.3</span></code> or <code class="docutils literal notranslate"><span class="pre">v1.2.3</span></code>. Pull request runs build the docs and skip the deploy job.</p>
+<p>To backfill a released version, run the workflow manually with <strong>Run workflow</strong>:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">ref</span></code>: the branch, tag, or SHA to build. The default is the branch that you run the workflow from.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">version</span></code>: the destination directory, such as <code class="docutils literal notranslate"><span class="pre">v1.2.3</span></code>. Set it for a backfill, because the default is <code class="docutils literal notranslate"><span class="pre">latest</span></code>.</p></li>
+</ul>
+<p>The deploy accepts only <code class="docutils literal notranslate"><span class="pre">latest</span></code> or a version such as <code class="docutils literal notranslate"><span class="pre">1.2.3</span></code>, <code class="docutils literal notranslate"><span class="pre">v1.2.3</span></code>, or <code class="docutils literal notranslate"><span class="pre">v1.2.3-rc1</span></code>. This applies to release tags too, so a release tagged <code class="docutils literal notranslate"><span class="pre">1.2</span></code> fails its docs deploy.</p>
+<p>A run from a tag or from a branch other than the default also needs an allowed rule in the <code class="docutils literal notranslate"><span class="pre">github-pages</span></code> environment.</p>
+</section>
 <section id="monitor-workflow-runs">
 <h2>Monitor workflow runs<a class="headerlink" href="#monitor-workflow-runs" title="Link to this heading">¶</a></h2>
 <p>Check the <strong>Actions</strong> tab in your GitHub repository. Each workflow runs on its configured trigger:</p>
@@ -341,7 +368,7 @@ git<span class="w"> </span>tag<span class="w"> </span>patch<span class="w"> </sp
 <li><p><strong>CI</strong>: runs on every push and pull request</p></li>
 <li><p><strong>CodeQL</strong>: runs on push to main and on a weekly schedule</p></li>
 <li><p><strong>Publish</strong>: runs on push to main (TestPyPI) and on release (PyPI)</p></li>
-<li><p><strong>Docs</strong>: runs on push to main and on release</p></li>
+<li><p><strong>Docs</strong>: runs on push to main, on pull requests, on release, and on manual dispatch</p></li>
 </ul>
 </section>
 </section>
@@ -375,7 +402,7 @@ git<span class="w"> </span>tag<span class="w"> </span>patch<span class="w"> </sp
         <div class="bottom-of-page">
           <div class="left-details">
             <div class="copyright">
-                Copyright &#169; 2026, Ryan Kanno
+                Copyright &#169; 2026, Ryan Kanno · build 2e6a38e
             </div>
             Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
             
@@ -383,7 +410,10 @@ git<span class="w"> </span>tag<span class="w"> </span>patch<span class="w"> </sp
             
           </div>
           <div class="right-details">
-            
+            <div class="icons">
+              <a class="muted-link " href="https://github.com/ryankanno/copier-py" aria-label="GitHub"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="1em" height="1em" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"></path></svg></a>
+              
+            </div>
           </div>
         </div>
         
@@ -407,6 +437,7 @@ git<span class="w"> </span>tag<span class="w"> </span>patch<span class="w"> </sp
 <li><a class="reference internal" href="#configure-dependabot-auto-merge">Configure Dependabot auto-merge</a></li>
 <li><a class="reference internal" href="#customize-the-ci-matrix">Customize the CI matrix</a></li>
 <li><a class="reference internal" href="#add-repository-secrets">Add repository secrets</a></li>
+<li><a class="reference internal" href="#publish-documentation-to-github-pages">Publish documentation to GitHub Pages</a></li>
 <li><a class="reference internal" href="#monitor-workflow-runs">Monitor workflow runs</a></li>
 </ul>
 </li>
@@ -419,9 +450,10 @@ git<span class="w"> </span>tag<span class="w"> </span>patch<span class="w"> </sp
       
     </aside>
   </div>
-</div><script src="_static/documentation_options.js?v=0d92831c"></script>
+</div><script src="_static/documentation_options.js?v=a9ea0705"></script>
     <script src="_static/doctools.js?v=fd6eb6e6"></script>
     <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="_static/scripts/furo.js?v=46bd48cc"></script>
+    <script src="_static/version-switcher.js?v=0b9390c9"></script>
     </body>
 </html>
