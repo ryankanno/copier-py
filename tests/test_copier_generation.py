@@ -6,11 +6,15 @@
 
 """Tests project generation."""
 
+import configparser
 import logging
 import mmap
 import os
 import re
+import runpy
+import sys
 from pathlib import Path
+from typing import Any
 
 import pytest
 from binaryornot.check import is_binary
@@ -44,6 +48,9 @@ EXPECTED_BASE_BAKED_FILES = [
     "/docs/index.rst",
     "/docs/make.bat",
     "/docs/_static/.keep",
+    "/docs/_static/version-switcher.css",
+    "/docs/_static/version-switcher.js",
+    "/docs/_templates/sidebar/version-selector.html",
     "/docs/getting_started/getting_started.rst",
     "/docs/roadmap/roadmap.rst",
     "/docs/todo/todo.rst",
@@ -858,6 +865,208 @@ def test_dependabot_uses_uv_ecosystem(
     assert "dependency-type:" not in settings, (
         "dependency-type is unsupported in uv groups; use patterns instead"
     )
+
+
+def test_readme_install_command_is_valid(
+    tmp_path: Path, default_context: dict[str, str | bool]
+) -> None:
+    """Test the generated README documents a working install step."""
+    dest = generate_project(tmp_path, default_context)
+
+    content = (dest / "README.md").read_text(encoding="utf-8")
+
+    # `uv install` is not a uv subcommand, so the documented bootstrap step
+    # would fail and the user would never generate the uv.lock CI requires.
+    assert "uv install" not in content
+    assert "uv sync" in content
+
+
+def test_commitlint_comment_emoji_are_intact(
+    tmp_path: Path, default_context: dict[str, str | bool]
+) -> None:
+    """Test the commitlint comment keeps its error and warning markers."""
+    dest = generate_project(tmp_path, default_context)
+
+    workflow = dest / ".github" / "workflows" / "commitlint.yml"
+    content = workflow.read_text(encoding="utf-8")
+
+    for emoji in ("👕", "👉", "👈", "🔎", "ℹ️", "❌", "⚠️"):
+        assert emoji in content, f"commitlint.yml lost the {emoji}"
+
+
+@pytest.mark.parametrize("package_name", ["Bad-Name", "1surf", "has space"])
+def test_rejects_invalid_package_name(
+    tmp_path: Path,
+    default_context: dict[str, str | bool],
+    package_name: str,
+) -> None:
+    """Test a package name that is not snake_case stops generation."""
+    default_context["package_name"] = package_name
+
+    with pytest.raises(ValueError, match="valid Python identifier"):
+        generate_project(tmp_path, default_context)
+
+
+@pytest.mark.parametrize(
+    "versions", ["3.10", "3.12.1", "3.130", "pypy3.11.9", "3.11, 3.9"]
+)
+def test_rejects_unsupported_python_version(
+    tmp_path: Path,
+    default_context: dict[str, str | bool],
+    versions: str,
+) -> None:
+    """Test a version outside the supported list stops generation."""
+    default_context["supported_python_versions"] = versions
+
+    with pytest.raises(ValueError, match="Invalid Python version"):
+        generate_project(tmp_path, default_context)
+
+
+def load_docs_conf(
+    project: Path, monkeypatch: pytest.MonkeyPatch
+) -> dict[str, Any]:
+    """Execute a Sphinx conf.py the way Sphinx does and return its values."""
+    # conf.py inserts into sys.path, which must not leak between tests.
+    monkeypatch.setattr(sys, "path", list(sys.path))
+    return runpy.run_path(str(project / "docs" / "conf.py"))
+
+
+def test_furo_docs_render_the_version_selector(
+    tmp_path: Path,
+    default_context: dict[str, str | bool],
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Test furo projects put the selector in the sidebar."""
+    dest = generate_project(tmp_path, default_context)
+
+    conf = load_docs_conf(dest, monkeypatch)
+
+    assert conf["html_css_files"] == ["version-switcher.css"]
+    assert conf["html_js_files"] == ["version-switcher.js"]
+    assert "sidebar/version-selector.html" in conf["html_sidebars"]["**"]
+    assert (
+        conf["html_theme_options"]["source_repository"]
+        == (default_context["project_url"])
+    )
+
+
+def test_rtd_docs_load_the_version_switcher(
+    tmp_path: Path,
+    default_context: dict[str, str | bool],
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Test RTD projects load the script that injects the selector."""
+    default_context["sphinx_theme"] = "sphinx-rtd-theme"
+    dest = generate_project(tmp_path, default_context)
+
+    conf = load_docs_conf(dest, monkeypatch)
+
+    assert conf["html_css_files"] == ["version-switcher.css"]
+    assert conf["html_js_files"] == ["version-switcher.js"]
+    assert "html_sidebars" not in conf
+    assert conf["html_context"]["github_version"] == "main"
+
+
+def test_pydata_docs_use_the_native_version_switcher(
+    tmp_path: Path,
+    default_context: dict[str, str | bool],
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Test pydata projects read versions.json with the theme's switcher."""
+    default_context["sphinx_theme"] = "pydata-sphinx-theme"
+    monkeypatch.setenv("DOCS_VERSION_MATCH", "1.2.3")
+    dest = generate_project(tmp_path, default_context)
+
+    conf = load_docs_conf(dest, monkeypatch)
+
+    assert "html_js_files" not in conf
+    assert conf["html_theme_options"]["switcher"] == {
+        "json_url": "https://ryankanno.github.io/copier-py/versions.json",
+        "version_match": "1.2.3",
+    }
+
+
+def test_other_themes_have_no_version_switcher(
+    tmp_path: Path,
+    default_context: dict[str, str | bool],
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Test themes without upstream support stay free of switcher wiring."""
+    default_context["sphinx_theme"] = "alabaster"
+    dest = generate_project(tmp_path, default_context)
+
+    conf = load_docs_conf(dest, monkeypatch)
+    workflow = (dest / ".github" / "workflows" / "docs.yml").read_text(
+        encoding="utf-8"
+    )
+
+    assert "html_js_files" not in conf
+    assert "html_sidebars" not in conf
+    assert "Overlay docs theme assets" not in workflow
+
+
+def test_docs_copyright_carries_the_build_commit(
+    tmp_path: Path,
+    default_context: dict[str, str | bool],
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Test docs fall back to GITHUB_SHA when git has no commit to report."""
+    monkeypatch.setenv("GITHUB_SHA", "a" * 40)
+    dest = generate_project(tmp_path, default_context)
+
+    conf = load_docs_conf(dest, monkeypatch)
+
+    assert conf["copyright"].endswith(" · build aaaaaaa")
+
+
+def test_docs_tox_env_receives_the_published_version(
+    tmp_path: Path, default_context: dict[str, str | bool]
+) -> None:
+    """Test tox hands the workflow's version to the pydata switcher."""
+    dest = generate_project(tmp_path, default_context)
+
+    tox_ini = configparser.ConfigParser(interpolation=None)
+    tox_ini.read(dest / "tox.ini", encoding="utf-8")
+
+    assert "DOCS_VERSION_MATCH" in tox_ini["testenv:docs"].get("pass_env", "")
+
+
+def test_docs_workflow_publishes_versioned_docs(
+    tmp_path: Path, default_context: dict[str, str | bool]
+) -> None:
+    """Test docs deploy per version through the official Pages actions."""
+    dest = generate_project(tmp_path, default_context)
+
+    workflow = (dest / ".github" / "workflows" / "docs.yml").read_text(
+        encoding="utf-8"
+    )
+
+    assert "release:" in workflow
+    assert "Regenerate versions.json" in workflow
+    assert "actions/deploy-pages@" in workflow
+    assert "peaceiris/actions-gh-pages" not in workflow
+    assert "ref: ${{ inputs.ref || github.ref }}" in workflow
+    assert "{% raw %}" not in workflow
+
+
+def test_repo_docs_render_the_version_selector(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Test this repo's own docs expose the versions they publish."""
+    repo = Path(TEMPLATE_DIR)
+    monkeypatch.setenv("GITHUB_SHA", "a" * 40)
+
+    conf = load_docs_conf(repo, monkeypatch)
+
+    assert conf["html_css_files"] == ["version-switcher.css"]
+    assert conf["html_js_files"] == ["version-switcher.js"]
+    assert conf["project_copyright"].endswith(" · build aaaaaaa")
+    assert "sidebar/version-selector.html" in conf["html_sidebars"]["**"]
+    assert (repo / "docs" / "_static" / "version-switcher.js").is_file()
+    assert (repo / "docs" / "_static" / "version-switcher.css").is_file()
+    assert (
+        repo / "docs" / "_templates" / "sidebar" / "version-selector.html"
+    ).is_file()
 
 
 # vim: fenc=utf-8
