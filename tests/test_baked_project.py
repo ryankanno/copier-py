@@ -6,13 +6,17 @@
 
 """Runs a generated project end to end."""
 
+import json
 import os
 import shutil
 import subprocess
+from itertools import takewhile
 from pathlib import Path
 
 import pytest
 from copier import run_copy
+
+from tests.test_copier_generation import THIRD_PARTY_SPHINX_THEMES
 
 
 TEMPLATE_DIR = str(Path(__file__).parent.parent)
@@ -34,6 +38,20 @@ REQUIRED_ANSWERS = {
     'project_short_description': 'A foobar project',
     'project_url': 'https://github.com/ryankanno/foobar',
 }
+
+GIT_WITH_IDENTITY = [
+    'git',
+    '-c',
+    'user.name=test',
+    '-c',
+    'user.email=test@example.com',
+]
+
+# Width of `        ` before the keys of a workflow step.
+STEP_INDENT = 8
+
+# Width of `          ` before the script lines of a workflow step.
+STEP_SCRIPT_INDENT = 10
 
 
 def run(
@@ -68,7 +86,7 @@ def run(
     return result
 
 
-def bake_with_real_defaults(tmp_path: Path) -> Path:
+def bake_with_real_defaults(tmp_path: Path, **answers: str) -> Path:
     """Generate a project using copier.yml's own defaults.
 
     Deliberately not the default_context fixture, which carries placeholder
@@ -78,12 +96,219 @@ def bake_with_real_defaults(tmp_path: Path) -> Path:
     run_copy(
         TEMPLATE_DIR,
         str(tmp_path),
-        data=REQUIRED_ANSWERS,
+        data={**REQUIRED_ANSWERS, **answers},
         defaults=True,
         unsafe=True,
         vcs_ref='HEAD',
     )
     return tmp_path
+
+
+def workflow_step_script(workflow: Path, name: str) -> str:
+    """The `run: |` script of the named step in a workflow file."""
+    lines = workflow.read_text(encoding='utf-8').splitlines()
+    step = f'      - name: {name}'
+    assert step in lines, f'{workflow.name} has no step named {name!r}'
+
+    after_step = lines[lines.index(step) + 1 :]
+    step_lines = list(
+        takewhile(
+            lambda line: (
+                not line.strip() or line.startswith(' ' * STEP_INDENT)
+            ),
+            after_step,
+        )
+    )
+    assert '        run: |' in step_lines, f'step {name!r} has no run script'
+    body = step_lines[step_lines.index('        run: |') + 1 :]
+
+    script = []
+    for line in body:
+        if line.strip() and not line.startswith(' ' * STEP_SCRIPT_INDENT):
+            break
+        script.append(line[STEP_SCRIPT_INDENT:])
+    return '\n'.join(script)
+
+
+def commit_and_push(checkout: Path, branch: str) -> None:
+    run(['git', 'add', '-A'], cwd=checkout)
+    run([*GIT_WITH_IDENTITY, 'commit', '-m', 'seed'], cwd=checkout)
+    run(['git', 'push', 'origin', branch], cwd=checkout)
+
+
+def clone_for_pages_deploy(tmp_path: Path, has_pages_branch: bool) -> Path:
+    """A clone of the default branch, as the deploy job's checkout makes."""
+    remote = tmp_path / 'remote.git'
+    seed = tmp_path / 'seed'
+    run(
+        ['git', 'init', '--bare', '--initial-branch=main', str(remote)],
+        cwd=tmp_path,
+    )
+    run(['git', 'clone', str(remote), str(seed)], cwd=tmp_path)
+
+    (seed / 'README.md').write_text('source\n', encoding='utf-8')
+    commit_and_push(seed, 'main')
+
+    # Shares a suffix with gh-pages, so it must not count as that branch.
+    run(['git', 'push', 'origin', 'main:docs/gh-pages'], cwd=seed)
+
+    if has_pages_branch:
+        run(['git', 'checkout', '--orphan', 'gh-pages'], cwd=seed)
+        run(['git', 'rm', '-rf', '--quiet', '.'], cwd=seed)
+        (seed / 'versions.json').write_text('[]\n', encoding='utf-8')
+        commit_and_push(seed, 'gh-pages')
+
+    checkout = tmp_path / 'checkout'
+    run(
+        ['git', 'clone', '--branch', 'main', str(remote), str(checkout)],
+        cwd=tmp_path,
+    )
+    return checkout
+
+
+@pytest.mark.bake
+@pytest.mark.parametrize('has_pages_branch', [False, True])
+def test_docs_deploy_starts_from_the_published_branch(
+    tmp_path: Path, has_pages_branch: bool
+) -> None:
+    project = bake_with_real_defaults(tmp_path / 'project')
+    checkout = clone_for_pages_deploy(tmp_path, has_pages_branch)
+
+    script = workflow_step_script(
+        project / '.github' / 'workflows' / 'docs.yml',
+        'Select gh-pages branch',
+    )
+    run(['bash', '-c', script], cwd=checkout)
+
+    branch = run(['git', 'branch', '--show-current'], cwd=checkout)
+    assert branch.stdout.strip() == 'gh-pages'
+
+    # Source files must never reach the published site.
+    assert not (checkout / 'README.md').exists()
+    assert (checkout / 'versions.json').exists() == has_pages_branch
+
+    (checkout / 'latest').mkdir()
+    (checkout / 'latest' / 'index.html').write_text('docs\n', encoding='utf-8')
+    commit_and_push(checkout, 'gh-pages')
+
+    published = run(
+        ['git', 'ls-remote', '--exit-code', '--heads', 'origin', 'gh-pages'],
+        cwd=checkout,
+    )
+    assert published.stdout
+
+
+@pytest.mark.bake
+def test_docs_deploy_lists_every_published_version(tmp_path: Path) -> None:
+    project = bake_with_real_defaults(tmp_path / 'project')
+    pages = tmp_path / 'pages'
+    for name in (
+        'latest',
+        'v1.2.3',
+        'v1.10.0',
+        '1.2.3-1',
+        '1.2.3-rc1',
+        '1.2.3-²',
+        '_static',
+    ):
+        (pages / name).mkdir(parents=True)
+
+    script = workflow_step_script(
+        project / '.github' / 'workflows' / 'docs.yml',
+        'Regenerate versions.json',
+    )
+    run(
+        ['env', 'REPO_OWNER=acme', 'REPO_NAME=foo', 'bash', '-c', script],
+        cwd=pages,
+    )
+
+    versions = json.loads((pages / 'versions.json').read_text('utf-8'))
+    assert [version['name'] for version in versions] == [
+        'latest',
+        'v1.10.0',
+        'v1.2.3',
+        '1.2.3-1',
+        '1.2.3-rc1',
+        '1.2.3-²',
+    ]
+
+
+def determine_destination(
+    tmp_path: Path, event: str, version: str
+) -> subprocess.CompletedProcess[str]:
+    project = bake_with_real_defaults(tmp_path / 'project')
+    script = workflow_step_script(
+        project / '.github' / 'workflows' / 'docs.yml',
+        'Determine destination directory',
+    )
+    return run(
+        [
+            'env',
+            f'EVENT_NAME={event}',
+            f'RELEASE_TAG={version if event == "release" else ""}',
+            f'INPUT_VERSION={version if event == "workflow_dispatch" else ""}',
+            f'GITHUB_OUTPUT={tmp_path / "github_output"}',
+            'bash',
+            '-c',
+            script,
+        ],
+        cwd=tmp_path,
+        check=False,
+    )
+
+
+@pytest.mark.bake
+@pytest.mark.parametrize(
+    ('event', 'version', 'directory'),
+    [
+        ('push', '', 'latest'),
+        ('workflow_dispatch', '', 'latest'),
+        ('workflow_dispatch', 'v1.2.3', 'v1.2.3'),
+        ('release', '1.2.3-rc1', '1.2.3-rc1'),
+    ],
+)
+def test_docs_deploy_picks_the_version_directory(
+    tmp_path: Path, event: str, version: str, directory: str
+) -> None:
+    result = determine_destination(tmp_path, event, version)
+
+    assert result.returncode == 0, result.stderr
+    output = tmp_path / 'github_output'
+    assert output.read_text(encoding='utf-8') == f'dir={directory}\n'
+
+
+@pytest.mark.bake
+@pytest.mark.parametrize(
+    ('event', 'version'),
+    [
+        ('workflow_dispatch', 'x"; touch injected; echo "'),
+        ('workflow_dispatch', 'stable'),
+        ('workflow_dispatch', '.git'),
+        ('workflow_dispatch', '../artifact'),
+        ('workflow_dispatch', '1.2.3-/../../.git'),
+        ('workflow_dispatch', '1.2.3\nextra=1'),
+        ('release', '../artifact'),
+    ],
+)
+def test_docs_deploy_refuses_a_version_it_cannot_list(
+    tmp_path: Path, event: str, version: str
+) -> None:
+    result = determine_destination(tmp_path, event, version)
+
+    assert result.returncode != 0
+    assert not (tmp_path / 'injected').exists()
+    assert not (tmp_path / 'github_output').exists()
+
+
+@pytest.mark.bake
+@pytest.mark.parametrize('sphinx_theme', THIRD_PARTY_SPHINX_THEMES)
+def test_baked_project_resolves_with_theme(
+    tmp_path: Path, sphinx_theme: str
+) -> None:
+    project = bake_with_real_defaults(tmp_path, sphinx_theme=sphinx_theme)
+
+    # The theme lives in the docs group, which uv lock always resolves.
+    run(['uv', 'lock'], cwd=project)
 
 
 @pytest.mark.bake

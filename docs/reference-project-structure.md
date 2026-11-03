@@ -35,6 +35,12 @@ project-root/
 ├── docs/
 │   ├── Makefile
 │   ├── _static/
+│   │   ├── .keep
+│   │   ├── version-switcher.css
+│   │   └── version-switcher.js
+│   ├── _templates/
+│   │   └── sidebar/
+│   │       └── version-selector.html
 │   ├── conf.py
 │   ├── getting_started/
 │   │   └── getting_started.rst
@@ -96,6 +102,8 @@ project-root/
 | Path | Description |
 |------|-------------|
 | `docs/conf.py` | Sphinx configuration with selected theme and MyST parser. |
+| `docs/_static/version-switcher.*` | Version selector script and styles. Generated for every theme, but only `furo` and `sphinx-rtd-theme` load them. |
+| `docs/_templates/sidebar/version-selector.html` | Version selector markup for the `furo` sidebar. Generated for every theme, but only `furo` uses it. |
 | `docs/index.rst` | Documentation root page with toctree. |
 | `docs/getting_started/` | Getting started documentation section. |
 | `docs/usage/` | Usage documentation section. |
@@ -120,7 +128,7 @@ project-root/
 | `hadolint.yml` | Push, PR | Dockerfile linting. |
 | `commitlint.yml` | PR | Validates commit messages against Conventional Commits. |
 | `trufflehog.yml` | Push, PR | Scans for leaked secrets. |
-| `docs.yml` | Push to main, release | Builds and publishes Sphinx documentation to GitHub Pages. |
+| `docs.yml` | Push to main, pull request, release, manual | Builds Sphinx documentation and publishes each version to GitHub Pages. Needs GitHub Actions as the Pages source. |
 | `release-drafter.yml` | Push to main | Drafts release notes from merged PRs. |
 | `pr-size-labeling.yml` | PR | Adds size labels (XS, S, M, L, XL) to PRs. |
 | `pr-labeler.yml` | PR | Adds labels based on file paths changed. |

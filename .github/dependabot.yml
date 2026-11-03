@@ -69,3 +69,17 @@ updates:
     labels:
       - "automerge"
       - "dependencies"
+
+  # No "uv" or "github-actions" entry for the template directory: its
+  # pyproject.toml and workflows are Jinja2, which Dependabot cannot parse.
+  - package-ecosystem: "docker"
+    directory: "/template"
+    schedule:
+      interval: "weekly"
+    assignees:
+      - "ryankanno"
+    commit-message:
+      prefix: "build(docker)"
+    labels:
+      - "docker"
+      - "dependencies"
