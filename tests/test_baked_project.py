@@ -302,18 +302,23 @@ def test_docs_deploy_refuses_a_version_it_cannot_list(
 
 # Stands in for the GitHub CLI, which the step calls over the network. It
 # logs each call and answers `gh pr view` with the labels in FAKE_LABELS.
+# FAKE_BODY_FAILS makes the body lookup fail, as an API error would.
 FAKE_GH = """#!/usr/bin/env bash
 printf '%s\\n' "$*" >> "$GH_LOG"
 case "$*" in
   *"--json labels"*) printf '%s\\n' $FAKE_LABELS ;;
-  *"--json body"*) echo 'Bumps foo from 1.0 to 1.1.' ;;
+  *"--json body"*)
+    [ -z "$FAKE_BODY_FAILS" ] || exit 1
+    echo 'Bumps foo from 1.0 to 1.1.' ;;
 esac
 """
 
 PR_URL = 'https://github.com/ryankanno/foobar/pull/7'
 
 
-def auto_merge(tmp_path: Path, labels: str) -> list[str]:
+def auto_merge(
+    tmp_path: Path, labels: str, body_fails: bool = False
+) -> list[str]:
     project = bake_with_real_defaults(tmp_path / 'project')
     script = workflow_step_script(
         project
@@ -337,11 +342,18 @@ def auto_merge(tmp_path: Path, labels: str) -> list[str]:
             f'GH_LOG={gh_log}',
             f'FAKE_LABELS={labels}',
             f'PR_URL={PR_URL}',
+            f'FAKE_BODY_FAILS={"1" if body_fails else ""}',
+            # The command GitHub runs for a step with `shell: bash`.
             'bash',
+            '--noprofile',
+            '--norc',
+            '-eo',
+            'pipefail',
             '-c',
             script,
         ],
         cwd=tmp_path,
+        check=not body_fails,
     )
     return gh_log.read_text(encoding='utf-8').splitlines()
 
@@ -366,6 +378,15 @@ def test_dependabot_auto_merge_leaves_other_prs_open(
     tmp_path: Path, labels: str
 ) -> None:
     calls = auto_merge(tmp_path, labels)
+
+    assert not [call for call in calls if call.startswith('pr merge')]
+
+
+@pytest.mark.bake
+def test_dependabot_auto_merge_stops_when_the_body_lookup_fails(
+    tmp_path: Path,
+) -> None:
+    calls = auto_merge(tmp_path, 'automerge dependencies', body_fails=True)
 
     assert not [call for call in calls if call.startswith('pr merge')]
 

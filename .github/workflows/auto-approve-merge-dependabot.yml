@@ -53,6 +53,11 @@ jobs:
   auto-merge:
     name: Auto merge Dependabot PRs
     runs-on: ubuntu-latest
+    # Serialized per PR like auto-approve, so the second run sees the first's
+    # merge rather than racing it.
+    concurrency:
+      group: dependabot-merge-${{ github.event.pull_request.number || github.run_id }}
+      cancel-in-progress: false
     permissions:
       checks: read
       contents: write
@@ -85,6 +90,7 @@ jobs:
         env:
           GH_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
           PR_URL: "${{ github.event.pull_request.html_url }}"
+        shell: bash
         # dependabot.yml labels only the ecosystems that opt in with "automerge".
         run: |
           labels=$(gh pr view "$PR_URL" --json labels --jq '.labels[].name')
@@ -92,4 +98,6 @@ jobs:
             echo "Not labeled automerge, or labeled major; leaving it open."
             exit 0
           fi
-          gh pr merge "$PR_URL" --squash --body "$(gh pr view "$PR_URL" --json body --jq .body)"
+          # An assignment fails the step when the lookup fails; an argument would not.
+          body=$(gh pr view "$PR_URL" --json body --jq .body)
+          gh pr merge "$PR_URL" --squash --body "$body"
