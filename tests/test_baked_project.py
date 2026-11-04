@@ -296,6 +296,7 @@ def test_docs_deploy_refuses_a_version_it_cannot_list(
     result = determine_destination(tmp_path, event, version)
 
     assert result.returncode != 0
+    assert '::error::The version must be' in result.stdout
     assert not (tmp_path / 'injected').exists()
     assert not (tmp_path / 'github_output').exists()
 

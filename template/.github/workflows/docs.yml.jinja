@@ -279,7 +279,8 @@ jobs:
           else
             dir=latest
           fi
-          # The deploy deletes and rewrites this directory, and versions.json lists only these names.
+          # The deploy deletes and rewrites this directory. The check is stricter than the
+          # versions.json listing, so a directory published before it can stay listed but not redeploy.
           if [[ ! "$dir" =~ ^(latest|v?[0-9]+\.[0-9]+\.[0-9]+([._-][A-Za-z0-9._-]+)?)$ ]]; then
             echo "::error::The version must be latest or look like v1.2.3 or 1.2.3-rc1."
             exit 1
