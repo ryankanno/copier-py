@@ -300,6 +300,97 @@ def test_docs_deploy_refuses_a_version_it_cannot_list(
     assert not (tmp_path / 'github_output').exists()
 
 
+# Stands in for the GitHub CLI, which the step calls over the network. It
+# logs each call and answers `gh pr view` with the labels in FAKE_LABELS.
+# FAKE_BODY_FAILS makes the body lookup fail, as an API error would.
+FAKE_GH = """#!/usr/bin/env bash
+printf '%s\\n' "$*" >> "$GH_LOG"
+case "$*" in
+  *"--json labels"*) printf '%s\\n' $FAKE_LABELS ;;
+  *"--json body"*)
+    [ -z "$FAKE_BODY_FAILS" ] || exit 1
+    echo 'Bumps foo from 1.0 to 1.1.' ;;
+esac
+"""
+
+PR_URL = 'https://github.com/ryankanno/foobar/pull/7'
+
+
+def auto_merge(
+    tmp_path: Path, labels: str, body_fails: bool = False
+) -> list[str]:
+    project = bake_with_real_defaults(tmp_path / 'project')
+    script = workflow_step_script(
+        project
+        / '.github'
+        / 'workflows'
+        / 'auto-approve-merge-dependabot.yml',
+        'Auto merge',
+    )
+    bin_dir = tmp_path / 'bin'
+    bin_dir.mkdir()
+    fake_gh = bin_dir / 'gh'
+    fake_gh.write_text(FAKE_GH, encoding='utf-8')
+    fake_gh.chmod(0o755)
+    gh_log = tmp_path / 'gh.log'
+    gh_log.touch()
+
+    run(
+        [
+            'env',
+            f'PATH={bin_dir}{os.pathsep}{os.environ["PATH"]}',
+            f'GH_LOG={gh_log}',
+            f'FAKE_LABELS={labels}',
+            f'PR_URL={PR_URL}',
+            f'FAKE_BODY_FAILS={"1" if body_fails else ""}',
+            # The command GitHub runs for a step with `shell: bash`.
+            'bash',
+            '--noprofile',
+            '--norc',
+            '-eo',
+            'pipefail',
+            '-c',
+            script,
+        ],
+        cwd=tmp_path,
+        check=not body_fails,
+    )
+    return gh_log.read_text(encoding='utf-8').splitlines()
+
+
+@pytest.mark.bake
+def test_dependabot_auto_merge_squashes_a_pr_labeled_automerge(
+    tmp_path: Path,
+) -> None:
+    calls = auto_merge(tmp_path, 'automerge dependencies')
+
+    assert (
+        f'pr merge {PR_URL} --squash --body Bumps foo from 1.0 to 1.1.'
+        in calls
+    )
+
+
+@pytest.mark.bake
+@pytest.mark.parametrize(
+    'labels', ['dependencies', 'github-actions', 'automerge major']
+)
+def test_dependabot_auto_merge_leaves_other_prs_open(
+    tmp_path: Path, labels: str
+) -> None:
+    calls = auto_merge(tmp_path, labels)
+
+    assert not [call for call in calls if call.startswith('pr merge')]
+
+
+@pytest.mark.bake
+def test_dependabot_auto_merge_stops_when_the_body_lookup_fails(
+    tmp_path: Path,
+) -> None:
+    calls = auto_merge(tmp_path, 'automerge dependencies', body_fails=True)
+
+    assert not [call for call in calls if call.startswith('pr merge')]
+
+
 @pytest.mark.bake
 @pytest.mark.parametrize('sphinx_theme', THIRD_PARTY_SPHINX_THEMES)
 def test_baked_project_resolves_with_theme(
