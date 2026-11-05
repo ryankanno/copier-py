@@ -26,7 +26,7 @@ This is a modern Python copier template project that generates standardized Pyth
 
 The template generates projects with:
 - `uv` for dependency management
-- `tox` for testing across Python versions (3.11, 3.12, 3.13, PyPy)
+- `tox` for testing across Python versions (3.12, 3.13, 3.14 by default; 3.15 is also allowed, none lower than `python_version`)
 - `pytest` with coverage, xdist, randomly, mock, and hypothesis
 - `ruff` for linting, formatting, and import sorting
 - `mypy` for type checking
@@ -56,7 +56,7 @@ All commands use `uv` as the package manager and `just` as the task runner.
 - `just install` - Install dependencies using uv
 
 ### Tox Environments
-- `just tox run -e py311` - Run tests on Python 3.11
+- `just tox run -e py314` - Run tests on Python 3.14
 - `just tox run -e py312` - Run tests on Python 3.12
 - `just tox run -e py313` - Run tests on Python 3.13
 - `just tox run -e coverage-py312` - Run tests with coverage on Python 3.12

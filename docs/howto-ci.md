@@ -55,7 +55,7 @@ The CI workflow tests across the Python versions you specified during generation
 ```yaml
 strategy:
   matrix:
-    python-version: ["3.11", "3.12", "3.13"]
+    python-version: ["3.12", "3.13", "3.14"]
 ```
 
 Update `tox.ini` and `pyproject.toml` to match if you add or remove Python versions.
