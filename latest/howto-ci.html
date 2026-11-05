@@ -6,7 +6,7 @@
 <link rel="index" title="Index" href="genindex.html"><link rel="search" title="Search" href="search.html"><link rel="next" title="How to Update an Existing Project" href="howto-update.html"><link rel="prev" title="How to Set Up Publishing to PyPI" href="howto-publishing.html">
 
     <!-- Generated with Sphinx 9.0.4 and Furo 2025.12.19 -->
-        <title>How to Configure CI with GitHub Actions - copier-py 0.0.0-post.64 documentation</title>
+        <title>How to Configure CI with GitHub Actions - copier-py 0.0.0-post.65 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=8dab3a3b" />
@@ -162,7 +162,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="index.html"><div class="brand">copier-py 0.0.0-post.64 documentation</div></a>
+      <a href="index.html"><div class="brand">copier-py 0.0.0-post.65 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -183,7 +183,7 @@
       
       <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
   
-  <span class="sidebar-brand-text">copier-py 0.0.0-post.64 documentation</span>
+  <span class="sidebar-brand-text">copier-py 0.0.0-post.65 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -315,10 +315,10 @@ git<span class="w"> </span>tag<span class="w"> </span>patch<span class="w"> </sp
 <p>The CI workflow tests across the Python versions you specified during generation. To change the matrix, edit <code class="docutils literal notranslate"><span class="pre">.github/workflows/ci.yml</span></code>:</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">strategy</span><span class="p">:</span>
 <span class="w">  </span><span class="nt">matrix</span><span class="p">:</span>
-<span class="w">    </span><span class="nt">python-version</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&quot;3.11&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;3.12&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;3.13&quot;</span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="nt">python-version</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&quot;3.12&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;3.13&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;3.14&quot;</span><span class="p p-Indicator">]</span>
 </pre></div>
 </div>
-<p>Update <code class="docutils literal notranslate"><span class="pre">tox.ini</span></code> and <code class="docutils literal notranslate"><span class="pre">pyproject.toml</span></code> to match if you add or remove Python versions.</p>
+<p>Update <code class="docutils literal notranslate"><span class="pre">tox.ini</span></code> and <code class="docutils literal notranslate"><span class="pre">pyproject.toml</span></code> to match if you add or remove Python versions. No version in the matrix can be lower than <code class="docutils literal notranslate"><span class="pre">requires-python</span></code> in <code class="docutils literal notranslate"><span class="pre">pyproject.toml</span></code>, because <code class="docutils literal notranslate"><span class="pre">uv</span> <span class="pre">sync</span></code> cannot install the project there.</p>
 </section>
 <section id="add-repository-secrets">
 <h2>Add repository secrets<a class="headerlink" href="#add-repository-secrets" title="Link to this heading">¶</a></h2>
@@ -402,7 +402,7 @@ git<span class="w"> </span>tag<span class="w"> </span>patch<span class="w"> </sp
         <div class="bottom-of-page">
           <div class="left-details">
             <div class="copyright">
-                Copyright &#169; 2026, Ryan Kanno · build 211bc1e
+                Copyright &#169; 2026, Ryan Kanno · build 8bf4627
             </div>
             Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
             
@@ -450,7 +450,7 @@ git<span class="w"> </span>tag<span class="w"> </span>patch<span class="w"> </sp
       
     </aside>
   </div>
-</div><script src="_static/documentation_options.js?v=626397c8"></script>
+</div><script src="_static/documentation_options.js?v=c61b13d1"></script>
     <script src="_static/doctools.js?v=fd6eb6e6"></script>
     <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="_static/scripts/furo.js?v=46bd48cc"></script>
