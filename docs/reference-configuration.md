@@ -9,7 +9,7 @@ All variables defined in `copier.yml` that are prompted during project generatio
 | `author_name` | string | `"Ryan Kanno"` | Author's full name |
 | `author_email` | string | `"ryankanno@localkinegrinds.com"` | Author's email address |
 | `project_name` | string | — | Human-readable project name |
-| `project_short_description` | string | `"This is a short description about {project_name}"` | One-line project description |
+| `project_short_description` | string | `"This is a short description about {{ project_name }}"` | One-line project description |
 | `project_url` | string | `"https://github.com/ryankanno/copier-py"` | Project repository URL |
 | `project_license` | string | `"MIT"` | Project license |
 | `github_repository_owner` | string | `"ryankanno"` | GitHub repository owner |
