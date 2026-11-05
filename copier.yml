@@ -64,7 +64,9 @@ version:
 python_version:
   type: str
   default: "3.12"
-  help: "Primary Python version"
+  help: "Minimum Python version (written to requires-python)"
+  validator: >-
+    {% if python_version not in ['3.12', '3.13', '3.14', '3.15'] %}Invalid Python version: {{ python_version }}{% endif %}
 
 # requires-python comes from python_version, so a tested version below it
 # cannot install the project.

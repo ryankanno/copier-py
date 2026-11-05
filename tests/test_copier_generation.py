@@ -923,6 +923,21 @@ def test_rejects_unsupported_python_version(
         generate_project(tmp_path, default_context)
 
 
+@pytest.mark.parametrize("python_version", ["3.11", "3", "4.0", "3.12.1"])
+def test_rejects_unsupported_minimum_python_version(
+    tmp_path: Path,
+    default_context: dict[str, str | bool],
+    python_version: str,
+) -> None:
+    """Test a minimum outside the supported list stops generation."""
+    default_context["python_version"] = python_version
+
+    with pytest.raises(
+        ValueError, match="'python_version': Invalid Python version"
+    ):
+        generate_project(tmp_path, default_context)
+
+
 @pytest.mark.parametrize(
     ("python_version", "versions"),
     [("3.13", "3.12, 3.13"), ("3.14", "3.13")],
