@@ -20,8 +20,8 @@ All variables defined in `copier.yml` that are prompted during project generatio
 
 | Variable | Type | Default | Description |
 |----------|------|---------|-------------|
-| `python_version` | string | `"3.12"` | Primary Python version |
-| `supported_python_versions` | string | `"3.11, 3.12, 3.13, pypy3.11"` | Comma-separated list of supported Python versions. Allowed values: `3.11`, `3.12`, `3.13`, `pypy3.11`. |
+| `python_version` | string | `"3.12"` | Minimum Python version, written to `requires-python`. Allowed values: `3.12`, `3.13`, `3.14`, `3.15`. |
+| `supported_python_versions` | string | `"3.12, 3.13, 3.14"` | Comma-separated list of the Python versions that tox and CI test on. Allowed values: `3.12`, `3.13`, `3.14`, `3.15`. No entry can be lower than `python_version`. |
 | `uv_version` | string | `"0.12.5"` | Version of uv to use |
 | `tox_version` | string | `"4.60.0"` | Version of tox to use |
 

@@ -6,7 +6,7 @@
 
 <div align="center">
 
-[![Python 3.11-3.13](https://img.shields.io/badge/python-3.11%20|%203.12%20|%203.13-blue.svg)](https://www.python.org/downloads/)
+[![Python 3.12-3.14](https://img.shields.io/badge/python-3.12%20|%203.13%20|%203.14-blue.svg)](https://www.python.org/downloads/)
 [![GitHub Issues][github-issues-shield]][github-issues-url]
 [![GitHub Pull Requests][github-prs-shield]][github-prs-url]
 [![License][project-license-shield]][project-license-url]
