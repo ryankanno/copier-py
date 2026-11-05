@@ -749,7 +749,7 @@ def test_pyproject_with_default_configuration(
                     pytest.fail("Should have ruff lint configuration")
 
 
-@pytest.mark.parametrize("python_version", ["3.11", "3.12", "3.13"])
+@pytest.mark.parametrize("python_version", ["3.12", "3.13", "3.14", "3.15"])
 def test_with_python_version(
     tmp_path: Path,
     default_context: dict[str, str | bool],
@@ -757,7 +757,7 @@ def test_with_python_version(
 ) -> None:
     """Verify generated project supports specified Python version."""
     default_context["python_version"] = python_version
-    default_context["supported_python_versions"] = "3.11, 3.12, 3.13, pypy3.11"
+    default_context["supported_python_versions"] = python_version
 
     dest = generate_project(tmp_path, default_context)
 
@@ -908,7 +908,8 @@ def test_rejects_invalid_package_name(
 
 
 @pytest.mark.parametrize(
-    "versions", ["3.10", "3.12.1", "3.130", "pypy3.11.9", "3.11, 3.9"]
+    "versions",
+    ["3.10", "3.11", "pypy3.11", "3.12.1", "3.130", "3.12, 3.9"],
 )
 def test_rejects_unsupported_python_version(
     tmp_path: Path,
@@ -920,6 +921,56 @@ def test_rejects_unsupported_python_version(
 
     with pytest.raises(ValueError, match="Invalid Python version"):
         generate_project(tmp_path, default_context)
+
+
+@pytest.mark.parametrize("python_version", ["3.11", "3", "4.0", "3.12.1"])
+def test_rejects_unsupported_minimum_python_version(
+    tmp_path: Path,
+    default_context: dict[str, str | bool],
+    python_version: str,
+) -> None:
+    """Test a minimum outside the supported list stops generation."""
+    default_context["python_version"] = python_version
+
+    with pytest.raises(
+        ValueError, match="'python_version': Invalid Python version"
+    ):
+        generate_project(tmp_path, default_context)
+
+
+@pytest.mark.parametrize(
+    ("python_version", "versions"),
+    [("3.13", "3.12, 3.13"), ("3.14", "3.13")],
+)
+def test_rejects_a_tested_version_below_the_minimum(
+    tmp_path: Path,
+    default_context: dict[str, str | bool],
+    python_version: str,
+    versions: str,
+) -> None:
+    """Test a project cannot test on a version it does not install on."""
+    default_context["python_version"] = python_version
+    default_context["supported_python_versions"] = versions
+
+    with pytest.raises(ValueError, match="lower than python_version"):
+        generate_project(tmp_path, default_context)
+
+
+def test_default_minimum_is_the_lowest_tested_version(
+    tmp_path: Path, default_context: dict[str, str | bool]
+) -> None:
+    """Test the default project requires the oldest Python it tests on."""
+    del default_context["python_version"]
+    del default_context["supported_python_versions"]
+
+    dest = generate_project(tmp_path, default_context)
+
+    pyproject = (dest / "pyproject.toml").read_text(encoding="utf-8")
+    minimum = re.search(r'requires-python = ">=3\.(\d+)"', pyproject)
+    assert minimum is not None
+    tox_ini = (dest / "tox.ini").read_text(encoding="utf-8")
+    tested = {int(minor) for minor in re.findall(r"\bpy3(\d+)\b", tox_ini)}
+    assert min(tested) == int(minimum.group(1))
 
 
 def load_docs_conf(
