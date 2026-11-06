@@ -10,8 +10,8 @@ on:
   workflow_dispatch:
 
 env:
-  UV_VERSION: 0.12.5
-  TOX_VERSION: 4.60.0
+  UV_VERSION: 0.13.5
+  TOX_VERSION: 4.67.1
   PRE_COMMIT_CACHE: ~/.cache/pre-commit
 
 jobs:
@@ -54,10 +54,9 @@ jobs:
       fail-fast: false
       matrix:
         python-version:
-          - "3.11"
           - "3.12"
           - "3.13"
-          - "pypy-3.11"
+          - "3.14"
         os: [ubuntu-latest]
     runs-on: ${{ matrix.os }}
     steps:
@@ -85,11 +84,7 @@ jobs:
       - name: set coverage mapping
         run: |
           MATRIX_PYTHON_VERSION=${{matrix.python-version}}
-          if [[ "$MATRIX_PYTHON_VERSION" == pypy* ]]; then
-            echo "TOX_COVERAGE_ENV=$(echo ${MATRIX_PYTHON_VERSION} | sed -e 's/[.\-]//g')" >> $GITHUB_ENV
-          else
-            echo "TOX_COVERAGE_ENV=py$(echo ${MATRIX_PYTHON_VERSION} | cut -d . -f -2 | sed -e 's/\.//g')" >> $GITHUB_ENV
-          fi
+          echo "TOX_COVERAGE_ENV=py$(echo ${MATRIX_PYTHON_VERSION} | cut -d . -f -2 | sed -e 's/\.//g')" >> $GITHUB_ENV
       # Dependabot PRs run without access to repository secrets, so
       # CODECOV_TOKEN is empty and the upload fails the job.
       - name: Upload to Codecov

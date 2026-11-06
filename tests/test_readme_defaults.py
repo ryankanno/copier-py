@@ -4,7 +4,7 @@
 #
 # Distributed under terms of the MIT license.
 
-"""Tests that README defaults match copier.yml."""
+"""Tests that documented defaults match copier.yml."""
 
 import re
 from pathlib import Path
@@ -42,6 +42,41 @@ def test_readme_documents_the_real_defaults() -> None:
     ]
 
     assert not mismatches, "README defaults are out of date:\n" + "\n".join(
+        mismatches
+    )
+
+
+# Matches "| `option_name` | type | `value` |" in the reference tables. Rows
+# whose default cell is "—" have no default and do not match.
+REFERENCE_DEFAULT = re.compile(
+    r'^\| `(?P<option>[a-z_]+)` \| [^|]+ \| `"?(?P<value>[^`"]+)"?` \|',
+    re.MULTILINE,
+)
+
+
+def test_reference_documents_the_real_defaults() -> None:
+    """Every default in the configuration reference matches copier.yml.
+
+    The reference tables restate copier.yml defaults, and version bumps
+    edit them by hand.
+    """
+    reference = (REPO_ROOT / "docs" / "reference-configuration.md").read_text(
+        encoding="utf-8"
+    )
+
+    documented = {
+        match["option"]: match["value"]
+        for match in REFERENCE_DEFAULT.finditer(reference)
+    }
+    assert documented, "no documented defaults found; has the format changed?"
+
+    mismatches = [
+        f"{option}: reference says {stated!r}, actual {actual!r}"
+        for option, stated in documented.items()
+        if (actual := copier_default(option)) != stated
+    ]
+
+    assert not mismatches, "reference defaults are out of date:\n" + "\n".join(
         mismatches
     )
 
