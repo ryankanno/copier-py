@@ -316,7 +316,7 @@ dev = [
     { name = "pytest-cov", specifier = ">=6.1.1,<8" },
     { name = "pytest-xdist", specifier = ">=3.6.1,<4" },
     { name = "ruff", specifier = ">=0.17.1,<0.18" },
-    { name = "tox", specifier = ">=4.60.0,<5" },
+    { name = "tox", specifier = ">=4.67.1,<5" },
     { name = "tox-uv", specifier = ">=1.21.5" },
 ]
 docs = [
