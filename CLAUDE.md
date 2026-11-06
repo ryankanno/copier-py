@@ -20,7 +20,7 @@ This is a modern Python copier template project that generates standardized Pyth
 - **Template exclusions**: `pyproject.toml` excludes `template/` from mypy/ruff/black to prevent linting unrendered Jinja2 templates
 - **Conditional files**: `copier.yml` `_exclude` rules conditionally remove files based on user selections (e.g., direnv, author files, Dependabot workflows). Note: `publish.yml` is never removed when GitHub Actions is enabled - it always builds and uploads artifacts even when all publish destinations are disabled.
 - **Boolean questions**: Use native `bool` type (not string y/n like cookiecutter)
-- **Validation**: `copier.yml` `validator` fields validate package_name and supported Python versions inline
+- **Validation**: `copier.yml` `validator` fields validate `package_name`, `python_version`, and `supported_python_versions` inline
 - **Conditional questions**: `when` fields control question visibility (e.g., Dependabot automerge only shown when both Dependabot and GitHub Actions are enabled)
 - **Test strategy**: Uses copier's Python API (`run_copy`) to test actual template generation, verifying that template variables are properly substituted and expected files exist
 
