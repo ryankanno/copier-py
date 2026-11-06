@@ -69,7 +69,7 @@ All commands use `uv` as the package manager and `just` as the task runner.
 # Generate a test project
 copier copy . /tmp/test-output --defaults --trust
 
-# Run the parity test against cookiecutter-py
+# Run the parity test against cookiecutter-py (exit 1 means unexpected differences)
 ./scripts/parity-test.sh
 ```
 
@@ -94,7 +94,7 @@ The project tests the copier template generation process:
 - `pyproject.toml` - Main project configuration, dependencies, tool settings (mypy, ruff, pytest, coverage)
 - `tox.ini` - Multi-Python testing configuration with test/coverage/lint environments
 - `Justfile` - Task runner commands wrapping common operations
-- `scripts/parity-test.sh` - Parity test comparing copier-py output against cookiecutter-py output
+- `scripts/parity-test.sh` - Parity test comparing copier-py output against cookiecutter-py output; exits 1 when unexpected differences exist
 
 ## Important Considerations
 
@@ -107,4 +107,4 @@ When modifying template files in `template/`:
 - Use `{% raw %}...{% endraw %}` around GitHub Actions `${{ }}` expressions in `.jinja` files
 - Static files without `.jinja` suffix are copied verbatim — `${{ }}` expressions are preserved as-is
 - Test with `just tests` to verify substitution works correctly
-- Run `./scripts/parity-test.sh` to verify output matches cookiecutter-py
+- Run `./scripts/parity-test.sh` to verify output matches cookiecutter-py (exit 1 means unexpected differences)
