@@ -319,7 +319,7 @@ PR_URL = 'https://github.com/ryankanno/foobar/pull/7'
 
 def auto_merge(
     tmp_path: Path, labels: str, body_fails: bool = False
-) -> list[str]:
+) -> tuple[int, list[str]]:
     project = bake_with_real_defaults(tmp_path / 'project')
     script = workflow_step_script(
         project
@@ -336,7 +336,7 @@ def auto_merge(
     gh_log = tmp_path / 'gh.log'
     gh_log.touch()
 
-    run(
+    result = run(
         [
             'env',
             f'PATH={bin_dir}{os.pathsep}{os.environ["PATH"]}',
@@ -356,14 +356,14 @@ def auto_merge(
         cwd=tmp_path,
         check=not body_fails,
     )
-    return gh_log.read_text(encoding='utf-8').splitlines()
+    return result.returncode, gh_log.read_text(encoding='utf-8').splitlines()
 
 
 @pytest.mark.bake
 def test_dependabot_auto_merge_squashes_a_pr_labeled_automerge(
     tmp_path: Path,
 ) -> None:
-    calls = auto_merge(tmp_path, 'automerge dependencies')
+    _, calls = auto_merge(tmp_path, 'automerge dependencies')
 
     assert (
         f'pr merge {PR_URL} --squash --body Bumps foo from 1.0 to 1.1.'
@@ -378,7 +378,7 @@ def test_dependabot_auto_merge_squashes_a_pr_labeled_automerge(
 def test_dependabot_auto_merge_leaves_other_prs_open(
     tmp_path: Path, labels: str
 ) -> None:
-    calls = auto_merge(tmp_path, labels)
+    _, calls = auto_merge(tmp_path, labels)
 
     assert not [call for call in calls if call.startswith('pr merge')]
 
@@ -387,8 +387,11 @@ def test_dependabot_auto_merge_leaves_other_prs_open(
 def test_dependabot_auto_merge_stops_when_the_body_lookup_fails(
     tmp_path: Path,
 ) -> None:
-    calls = auto_merge(tmp_path, 'automerge dependencies', body_fails=True)
+    returncode, calls = auto_merge(
+        tmp_path, 'automerge dependencies', body_fails=True
+    )
 
+    assert returncode != 0
     assert not [call for call in calls if call.startswith('pr merge')]
 
 
