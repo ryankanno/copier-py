@@ -12,8 +12,8 @@ on:
   workflow_dispatch:
 
 env:
-  UV_VERSION: 0.12.5
-  TOX_VERSION: 4.60.0
+  UV_VERSION: 0.13.5
+  TOX_VERSION: 4.67.1
   PYTHON_VERSION: "3.12"
   MAX_VERSIONS: 10
 
