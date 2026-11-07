@@ -249,7 +249,7 @@ def commitlint_language_version(config: Path) -> str | None:
     )
     assert hook, f'{config.name} has no commitlint hook'
     version = re.search(
-        r'^\s+language_version:\s*"?(?P<value>[^"\s]+)"?',
+        r'^[ \t]+language_version:[ \t]*"?(?P<value>[^"\s]+)"?',
         hook['body'],
         re.MULTILINE,
     )
@@ -268,6 +268,10 @@ def test_template_commitlint_node_matches_this_repo() -> None:
     )
 
     assert ours, 'commitlint hook has no language_version in this repo'
+    # nodeenv resolves only a full version; a major-only pin returns 404.
+    assert re.fullmatch(r'\d+\.\d+\.\d+', ours), (
+        f'commitlint pins node {ours}; nodeenv needs a full X.Y.Z version'
+    )
     assert theirs == ours, f'template pins {theirs}, this repo pins {ours}'
 
 
