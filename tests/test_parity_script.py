@@ -19,20 +19,23 @@ SCRIPT = REPO_ROOT / "scripts" / "parity-test.sh"
 # The real tools render from the network (cruft clones cookiecutter-py), so
 # stand-ins copy prepared trees to the destinations the script asks for.
 FAKE_UVX = """#!/usr/bin/env bash
+set -euo pipefail
 for dest in "$@"; do :; done
-mkdir -p "${dest}"
-cp -R "${PARITY_LEFT}/." "${dest}"
+mkdir -p "${dest:?}"
+cp -R "${PARITY_LEFT:?}/." "${dest:?}"
 """
 
 FAKE_UV = """#!/usr/bin/env bash
+set -euo pipefail
+out=""
 while [[ $# -gt 0 ]]; do
     if [ "$1" = "--output-dir" ]; then
         out="$2"
     fi
     shift
 done
-mkdir -p "${out}/foobar"
-cp -R "${PARITY_RIGHT}/." "${out}/foobar"
+mkdir -p "${out:?}/foobar"
+cp -R "${PARITY_RIGHT:?}/." "${out:?}/foobar"
 """
 
 DOCKERIGNORE_LEFT = ".git\n.copier-answers.yml\n.venv\n"
@@ -126,6 +129,20 @@ def test_whitespace_only_differences_do_not_change_exit(
     )
 
 
+def test_whitespace_change_beside_expected_dockerignore_swap_exits_zero(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    left, right = expected_only_trees()
+    right[".dockerignore"] = ".git  \n.cruft.json\r\n.venv\n"
+
+    code, output, report = run_parity(tmp_path, monkeypatch, left, right)
+
+    assert code == 0, output
+    assert result_line(report) == (
+        "RESULT: 0 unexpected, 3 expected difference(s) (+0 whitespace-only)"
+    )
+
+
 @pytest.mark.parametrize(
     "change",
     [
@@ -160,4 +177,5 @@ def test_unexpected_difference_exits_one_after_full_report(
 def test_help_documents_exit_one(tmp_path: Path) -> None:
     result = run(["bash", str(SCRIPT), "--help"], cwd=tmp_path)
 
-    assert "1  unexpected differences exist" in result.stdout
+    help_text = " ".join(result.stdout.split())
+    assert "1 unexpected differences exist" in help_text

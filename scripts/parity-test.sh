@@ -16,6 +16,8 @@ set -euo pipefail
 # Exit status:
 #   0  no unexpected differences (expected and whitespace-only ones are allowed)
 #   1  unexpected differences exist; the full report is written first
+#   A bad option or a failed render also exits non-zero, before any report
+#   is written.
 #   The expected differences come from the two tools themselves:
 #   .copier-answers.yml (copier-py only), .cruft.json (cookiecutter-py only),
 #   and the swap of those two names in .dockerignore.
@@ -51,7 +53,7 @@ while [[ $# -gt 0 ]]; do
             shift 2
             ;;
         --help)
-            head -27 "$0" | tail -25
+            sed -n '3,/^$/p' "$0"
             exit 0
             ;;
         *)
@@ -288,8 +290,10 @@ section "Parity Report"
         fi
 
         if [ "${file}" = "./.dockerignore" ]; then
-            changed_lines=$(diff "${COPIER_OUT}/${file}" "${COOKIECUTTER_PROJECT}/${file}" \
-                | grep '^[<>]' | sort || true)
+            # Whitespace-only changes beside the swap must not count.
+            changed_lines=$(diff --ignore-all-space --ignore-blank-lines \
+                "${COPIER_OUT}/${file}" "${COOKIECUTTER_PROJECT}/${file}" \
+                | grep '^[<>]' | sed 's/[[:space:]]*$//' | LC_ALL=C sort || true)
             if [ "${changed_lines}" = "${EXPECTED_DOCKERIGNORE_CHANGE}" ]; then
                 EXPECTED_COUNT=$((EXPECTED_COUNT + 1))
                 echo "--- ${file} (expected) ---"
