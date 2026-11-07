@@ -107,4 +107,4 @@ When modifying template files in `template/`:
 - Use `{% raw %}...{% endraw %}` around GitHub Actions `${{ }}` expressions in `.jinja` files
 - Static files without `.jinja` suffix are copied verbatim — `${{ }}` expressions are preserved as-is
 - Test with `just tests` to verify substitution works correctly
-- Run `./scripts/parity-test.sh` to verify output matches cookiecutter-py (exit 1 means unexpected differences)
+- Run `./scripts/parity-test.sh` to verify output matches cookiecutter-py apart from the expected tool differences (exit 1 means unexpected differences)
