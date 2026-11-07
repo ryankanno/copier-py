@@ -129,11 +129,18 @@ def test_whitespace_only_differences_do_not_change_exit(
     )
 
 
+@pytest.mark.parametrize(
+    "dockerignore",
+    [
+        pytest.param(".git  \n.cruft.json\r\n.venv\n", id="trailing"),
+        pytest.param(".git\n  .cruft.json\n.venv\n", id="leading"),
+    ],
+)
 def test_whitespace_change_beside_expected_dockerignore_swap_exits_zero(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, dockerignore: str
 ) -> None:
     left, right = expected_only_trees()
-    right[".dockerignore"] = ".git  \n.cruft.json\r\n.venv\n"
+    right[".dockerignore"] = dockerignore
 
     code, output, report = run_parity(tmp_path, monkeypatch, left, right)
 

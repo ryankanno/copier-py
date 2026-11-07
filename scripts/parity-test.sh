@@ -293,7 +293,8 @@ section "Parity Report"
             # Whitespace-only changes beside the swap must not count.
             changed_lines=$(diff --ignore-all-space --ignore-blank-lines \
                 "${COPIER_OUT}/${file}" "${COOKIECUTTER_PROJECT}/${file}" \
-                | grep '^[<>]' | sed 's/[[:space:]]*$//' | LC_ALL=C sort || true)
+                | grep '^[<>]' | sed -E 's/^([<>])[[:space:]]*/\1 /; s/[[:space:]]*$//' \
+                | LC_ALL=C sort || true)
             if [ "${changed_lines}" = "${EXPECTED_DOCKERIGNORE_CHANGE}" ]; then
                 EXPECTED_COUNT=$((EXPECTED_COUNT + 1))
                 echo "--- ${file} (expected) ---"
