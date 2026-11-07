@@ -241,5 +241,35 @@ def test_template_hook_revs_match_this_repo() -> None:
     )
 
 
+def commitlint_language_version(config: Path) -> str | None:
+    """The node version the commitlint hook pins, if any."""
+    text = config.read_text(encoding='utf-8')
+    hook = re.search(
+        r'-\s+id:\s*commitlint\s*\n(?P<body>(?:[ \t]+[^-\s].*\n)+)', text
+    )
+    assert hook, f'{config.name} has no commitlint hook'
+    version = re.search(
+        r'^\s+language_version:\s*"?(?P<value>[^"\s]+)"?',
+        hook['body'],
+        re.MULTILINE,
+    )
+    return version['value'] if version else None
+
+
+def test_template_commitlint_node_matches_this_repo() -> None:
+    """The template pins the same node for commitlint as this repo.
+
+    Without a pin, nodeenv asks for the newest node, and a pre-release
+    in the Node.js index breaks the hook install.
+    """
+    ours = commitlint_language_version(REPO_ROOT / '.pre-commit-config.yaml')
+    theirs = commitlint_language_version(
+        TEMPLATE_ROOT / '.pre-commit-config.yaml.jinja'
+    )
+
+    assert ours, 'commitlint hook has no language_version in this repo'
+    assert theirs == ours, f'template pins {theirs}, this repo pins {ours}'
+
+
 # vim: fenc=utf-8
 # vim: filetype=python
