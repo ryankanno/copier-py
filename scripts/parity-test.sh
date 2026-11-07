@@ -13,6 +13,15 @@ set -euo pipefail
 #   --output-dir DIR        Output directory (default: /tmp/copier-py-parity-test)
 #   --help                  Show this help message
 #
+# Exit status:
+#   0  no unexpected differences (expected and whitespace-only ones are allowed)
+#   1  unexpected differences exist; the full report is written first
+#   A bad option or a failed render also exits non-zero, before any report
+#   is written.
+#   The expected differences come from the two tools themselves:
+#   .copier-answers.yml (copier-py only), .cruft.json (cookiecutter-py only),
+#   and the swap of those two names in .dockerignore.
+#
 # Examples:
 #   ./scripts/parity-test.sh
 #   ./scripts/parity-test.sh --copier-ref v1.0.0 --cookiecutter-ref v2.3.0
@@ -44,7 +53,7 @@ while [[ $# -gt 0 ]]; do
             shift 2
             ;;
         --help)
-            head -17 "$0" | tail -15
+            sed -n '3,/^$/p' "$0"
             exit 0
             ;;
         *)
@@ -97,6 +106,12 @@ SUPPORTED_PYTHON_VERSIONS="3.12, 3.13"
 UV_VERSION="0.7.3"
 TOX_VERSION="4.25.0"
 SPHINX_THEME="furo"
+
+# The answers file each tool writes for itself.
+EXPECTED_COPIER_ONLY="./.copier-answers.yml"
+EXPECTED_COOKIECUTTER_ONLY="./.cruft.json"
+EXPECTED_DOCKERIGNORE_CHANGE="< .copier-answers.yml
+> .cruft.json"
 
 section() {
     echo ""
@@ -214,15 +229,35 @@ section "Parity Report"
     echo "common files:          ${COMMON_COUNT}"
     echo ""
 
+    EXPECTED_COUNT=0
+    COPIER_ONLY_COUNT=0
+    COOKIECUTTER_ONLY_COUNT=0
+
     if [ -n "${COPIER_ONLY}" ]; then
         echo "Files only in copier-py:"
-        echo "${COPIER_ONLY}" | sed 's/^/  /'
+        while IFS= read -r file; do
+            if [ "${file}" = "${EXPECTED_COPIER_ONLY}" ]; then
+                EXPECTED_COUNT=$((EXPECTED_COUNT + 1))
+                echo "  ${file} (expected)"
+            else
+                COPIER_ONLY_COUNT=$((COPIER_ONLY_COUNT + 1))
+                echo "  ${file}"
+            fi
+        done <<< "${COPIER_ONLY}"
         echo ""
     fi
 
     if [ -n "${COOKIECUTTER_ONLY}" ]; then
         echo "Files only in cookiecutter-py:"
-        echo "${COOKIECUTTER_ONLY}" | sed 's/^/  /'
+        while IFS= read -r file; do
+            if [ "${file}" = "${EXPECTED_COOKIECUTTER_ONLY}" ]; then
+                EXPECTED_COUNT=$((EXPECTED_COUNT + 1))
+                echo "  ${file} (expected)"
+            else
+                COOKIECUTTER_ONLY_COUNT=$((COOKIECUTTER_ONLY_COUNT + 1))
+                echo "  ${file}"
+            fi
+        done <<< "${COOKIECUTTER_ONLY}"
         echo ""
     fi
 
@@ -254,6 +289,21 @@ section "Parity Report"
             continue
         fi
 
+        if [ "${file}" = "./.dockerignore" ]; then
+            # Whitespace-only changes beside the swap must not count.
+            changed_lines=$(diff --ignore-all-space --ignore-blank-lines \
+                "${COPIER_OUT}/${file}" "${COOKIECUTTER_PROJECT}/${file}" \
+                | grep '^[<>]' | sed -E 's/^([<>])[[:space:]]*/\1 /; s/[[:space:]]*$//' \
+                | LC_ALL=C sort || true)
+            if [ "${changed_lines}" = "${EXPECTED_DOCKERIGNORE_CHANGE}" ]; then
+                EXPECTED_COUNT=$((EXPECTED_COUNT + 1))
+                echo "--- ${file} (expected) ---"
+                echo "${file_diff}" | sed 's/^/  /'
+                echo ""
+                continue
+            fi
+        fi
+
         DIFF_COUNT=$((DIFF_COUNT + 1))
         echo "--- ${file} ---"
         echo "${file_diff}" | sed 's/^/  /'
@@ -261,7 +311,7 @@ section "Parity Report"
     done <<< "${COMMON_FILES}"
 
     if [ "${DIFF_COUNT}" -eq 0 ]; then
-        echo "(no content differences in common files)"
+        echo "(no unexpected content differences in common files)"
         echo ""
     fi
 
@@ -276,28 +326,13 @@ section "Parity Report"
     echo "Identical files:       ${IDENTICAL_COUNT}"
     echo "Files with diffs:      ${DIFF_COUNT}"
     echo "Whitespace-only diffs: ${WHITESPACE_ONLY_COUNT}"
-
-    COPIER_ONLY_COUNT=0
-    COOKIECUTTER_ONLY_COUNT=0
-    if [ -n "${COPIER_ONLY}" ]; then
-        COPIER_ONLY_COUNT=$(echo "${COPIER_ONLY}" | wc -l | tr -d ' ')
-    fi
-    if [ -n "${COOKIECUTTER_ONLY}" ]; then
-        COOKIECUTTER_ONLY_COUNT=$(echo "${COOKIECUTTER_ONLY}" | wc -l | tr -d ' ')
-    fi
-
     echo "Only in copier-py:     ${COPIER_ONLY_COUNT}"
     echo "Only in cookiecutter:  ${COOKIECUTTER_ONLY_COUNT}"
+    echo "Expected differences:  ${EXPECTED_COUNT}"
     echo ""
 
-    TOTAL_DIFFS=$((DIFF_COUNT + COPIER_ONLY_COUNT + COOKIECUTTER_ONLY_COUNT))
-    if [ "${TOTAL_DIFFS}" -eq 0 ] && [ "${WHITESPACE_ONLY_COUNT}" -eq 0 ]; then
-        echo "RESULT: IDENTICAL"
-    elif [ "${TOTAL_DIFFS}" -eq 0 ]; then
-        echo "RESULT: IDENTICAL (ignoring ${WHITESPACE_ONLY_COUNT} whitespace-only difference(s))"
-    else
-        echo "RESULT: ${TOTAL_DIFFS} difference(s) found (+${WHITESPACE_ONLY_COUNT} whitespace-only)"
-    fi
+    UNEXPECTED_COUNT=$((DIFF_COUNT + COPIER_ONLY_COUNT + COOKIECUTTER_ONLY_COUNT))
+    echo "RESULT: ${UNEXPECTED_COUNT} unexpected, ${EXPECTED_COUNT} expected difference(s) (+${WHITESPACE_ONLY_COUNT} whitespace-only)"
 
     echo ""
     echo "Generated output preserved at:"
@@ -305,4 +340,11 @@ section "Parity Report"
     echo "  cookiecutter-py: ${COOKIECUTTER_PROJECT}"
     echo "  report:          ${REPORT_FILE}"
 
-} | tee "${REPORT_FILE}"
+} > "${REPORT_FILE}"
+
+# A pipe into tee would run the block in a subshell and lose UNEXPECTED_COUNT.
+cat "${REPORT_FILE}"
+
+if [ "${UNEXPECTED_COUNT}" -gt 0 ]; then
+    exit 1
+fi
