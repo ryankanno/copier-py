@@ -447,7 +447,7 @@ def test_baked_project_passes_its_pre_commit_hooks(tmp_path: Path) -> None:
     # git writes for a commit-msg hook.
     message = project / '.git' / 'COMMIT_EDITMSG'
     message.write_text('feat: add a thing\n', encoding='utf-8')
-    run(
+    result = run(
         [
             'uv',
             'run',
@@ -460,6 +460,13 @@ def test_baked_project_passes_its_pre_commit_hooks(tmp_path: Path) -> None:
         ],
         cwd=project,
     )
+
+    # The stage exits 0 with no commitlint hook at all, so the exit code
+    # alone does not prove the message was linted.
+    assert any(
+        line.startswith('commitlint') and line.endswith('Passed')
+        for line in result.stdout.splitlines()
+    ), result.stdout
 
 
 @pytest.mark.docker
