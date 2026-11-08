@@ -421,6 +421,47 @@ def test_baked_project_runs(tmp_path: Path) -> None:
     run(['uv', 'run', 'ruff', 'check', '.'], cwd=project)
 
 
+@pytest.mark.bake
+def test_baked_project_passes_its_pre_commit_hooks(tmp_path: Path) -> None:
+    project = bake_with_real_defaults(tmp_path)
+
+    run(['git', 'init', '--initial-branch=main'], cwd=project)
+    # Without uv.lock, the uv-lock hook creates it and fails the run.
+    run(['uv', 'sync'], cwd=project)
+    # pre-commit checks only the files git tracks.
+    run(['git', 'add', '-A'], cwd=project)
+
+    run(
+        [
+            'uv',
+            'run',
+            'pre-commit',
+            'run',
+            '--all-files',
+            '--show-diff-on-failure',
+        ],
+        cwd=project,
+    )
+
+    # The commitlint hook ignores --commit-msg-filename and reads the file
+    # git writes for a commit-msg hook.
+    message = project / '.git' / 'COMMIT_EDITMSG'
+    message.write_text('feat: add a thing\n', encoding='utf-8')
+    run(
+        [
+            'uv',
+            'run',
+            'pre-commit',
+            'run',
+            '--hook-stage',
+            'commit-msg',
+            '--commit-msg-filename',
+            str(message),
+        ],
+        cwd=project,
+    )
+
+
 @pytest.mark.docker
 def test_baked_project_docker_image(tmp_path: Path) -> None:
     project = bake_with_real_defaults(tmp_path)
