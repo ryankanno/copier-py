@@ -101,7 +101,7 @@ jobs:
 
       - name: uv publish TestPyPi
         run: uv publish -r test-pypi
-{% endif %}
+{% endif -%}
 {% if should_publish_to_pypi %}
   publish_pypi:
     if: github.repository_owner == '{{ github_repository_owner }}' && github.event_name == 'release' && github.event.action == 'published'
@@ -135,7 +135,7 @@ jobs:
 
       - name: uv publish PyPi
         run: uv publish
-{% endif %}
+{% endif -%}
 {% if should_publish_to_github_packages %}
   publish_github_packages:
     if: github.repository_owner == '{{ github_repository_owner }}' && github.event_name == 'release' && github.event.action == 'published'
@@ -175,7 +175,7 @@ jobs:
 
       - name: uv publish to GitHub Packages
         run: uv publish -r github
-{% endif %}
+{% endif -%}
 {% if should_attach_to_github_release %}
   attach_to_release:
     if: github.repository_owner == '{{ github_repository_owner }}' && github.event_name == 'release' && github.event.action == 'published'
@@ -195,4 +195,4 @@ jobs:
         run: gh release upload {% raw %}${{ github.ref_name }}{% endraw %} dist/*
         env:
           GH_TOKEN: {% raw %}${{ github.token }}{% endraw %}
-{% endif %}
+{% endif -%}
