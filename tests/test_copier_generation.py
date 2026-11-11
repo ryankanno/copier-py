@@ -1100,6 +1100,30 @@ def test_docs_workflow_publishes_versioned_docs(
     assert "{% raw %}" not in workflow
 
 
+def test_docs_version_selector_has_an_accessible_name(
+    tmp_path: Path, default_context: dict[str, str | bool]
+) -> None:
+    """Test both version selects carry an aria-label for screen readers."""
+    dest = generate_project(tmp_path, default_context)
+
+    selector = (
+        dest / "docs" / "_templates" / "sidebar" / "version-selector.html"
+    ).read_text(encoding="utf-8")
+    switcher = (dest / "docs" / "_static" / "version-switcher.js").read_text(
+        encoding="utf-8"
+    )
+
+    assert (
+        '<select id="cc-version-select"'
+        ' class="sidebar-version-selector__select"'
+        ' aria-label="Select documentation version">'
+    ) in selector
+    assert (
+        'select.setAttribute("aria-label", "Select documentation version");'
+        in switcher
+    )
+
+
 def test_repo_docs_render_the_version_selector(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:

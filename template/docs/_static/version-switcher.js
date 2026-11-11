@@ -55,6 +55,7 @@
     const select = document.createElement("select");
     select.id = "cc-version-select";
     select.className = "sidebar-version-selector__select";
+    select.setAttribute("aria-label", "Select documentation version");
     const placeholder = document.createElement("option");
     placeholder.value = "";
     placeholder.textContent = "loading…";
