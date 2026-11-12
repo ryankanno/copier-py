@@ -10,8 +10,8 @@ on:
   workflow_dispatch:
 
 env:
-  UV_VERSION: 0.13.5
-  TOX_VERSION: 4.67.1
+  UV_VERSION: 0.13.6
+  TOX_VERSION: 4.67.4
   PRE_COMMIT_CACHE: ~/.cache/pre-commit
 
 jobs:
