@@ -13,6 +13,9 @@ import os
 import re
 import runpy
 import sys
+import time
+from datetime import UTC
+from datetime import datetime
 from pathlib import Path
 from typing import Any
 
@@ -27,6 +30,8 @@ TEMPLATE_DIR = str(Path(__file__).parent.parent)
 
 PATTERN = r"{{(\s?)((?!%|#|-)[a-z_].*?)}}"
 RE_OBJ = re.compile(PATTERN)
+
+NOON = 12
 
 
 EXPECTED_BASE_BAKED_FILES = [
@@ -692,6 +697,32 @@ def test_with_version(
                     pytest.fail(
                         "pyproject.toml should have appropriate version"
                     )
+
+
+def test_history_date_is_utc(
+    tmp_path: Path,
+    default_context: dict[str, str | bool],
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Test HISTORY.rst shows the UTC date when the local date differs."""
+    # UTC-12 is on the previous day before noon UTC; UTC+14 is on the next
+    # day from 10:00 UTC. Noon splits the hours between the two zones.
+    zone = "Etc/GMT+12" if datetime.now(UTC).hour < NOON else "Etc/GMT-14"
+    try:
+        with monkeypatch.context() as m:
+            m.setenv("TZ", zone)
+            time.tzset()
+            before = datetime.now(UTC).date()
+            assert time.strftime("%Y-%m-%d") != before.isoformat()
+            dest = generate_project(tmp_path, default_context)
+            after = datetime.now(UTC).date()
+    finally:
+        time.tzset()
+
+    history = (dest / "HISTORY.rst").read_text(encoding="utf-8")
+    assert any(
+        f"0.0.1 - {day.isoformat()}\n" in history for day in (before, after)
+    )
 
 
 def test_justfile_lint_command_structure(
