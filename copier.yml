@@ -85,12 +85,12 @@ supported_python_versions:
 
 uv_version:
   type: str
-  default: "0.13.5"
+  default: "0.13.6"
   help: "uv version"
 
 tox_version:
   type: str
-  default: "4.67.1"
+  default: "4.67.4"
   help: "tox version"
 
 sphinx_theme:

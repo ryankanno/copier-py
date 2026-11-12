@@ -7,7 +7,7 @@ on:
 
 env:
   PYTHON_VERSION: "3.12"
-  UV_VERSION: 0.13.5
+  UV_VERSION: 0.13.6
 
 jobs:
   build:
