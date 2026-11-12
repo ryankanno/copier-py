@@ -707,21 +707,27 @@ def test_history_date_is_utc(
     """Test HISTORY.rst shows the UTC date when the local date differs."""
     # UTC-12 is on the previous day before noon UTC; UTC+14 is on the next
     # day from 10:00 UTC. Noon splits the hours between the two zones.
-    zone = "Etc/GMT+12" if datetime.now(UTC).hour < NOON else "Etc/GMT-14"
+    now = datetime.now(UTC)
+    zone = "Etc/GMT+12" if now.hour < NOON else "Etc/GMT-14"
+    before = now.date()
     try:
         with monkeypatch.context() as m:
             m.setenv("TZ", zone)
             time.tzset()
-            before = datetime.now(UTC).date()
-            assert time.strftime("%Y-%m-%d") != before.isoformat()
+            local = time.strftime("%Y-%m-%d", time.localtime(now.timestamp()))
+            assert local != before.isoformat(), (
+                f"TZ={zone} did not shift the local date away from UTC"
+            )
             dest = generate_project(tmp_path, default_context)
             after = datetime.now(UTC).date()
     finally:
         time.tzset()
 
     history = (dest / "HISTORY.rst").read_text(encoding="utf-8")
+    version = default_context["version"]
     assert any(
-        f"0.0.1 - {day.isoformat()}\n" in history for day in (before, after)
+        f"{version} - {day.isoformat()}\n" in history
+        for day in (before, after)
     )
 
 
