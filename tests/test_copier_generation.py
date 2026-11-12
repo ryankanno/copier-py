@@ -14,6 +14,7 @@ import re
 import runpy
 import sys
 import time
+import warnings
 from datetime import UTC
 from datetime import datetime
 from pathlib import Path
@@ -729,6 +730,17 @@ def test_history_date_is_utc(
         f"{version} - {day.isoformat()}\n" in history
         for day in (before, after)
     )
+
+
+def test_generation_emits_no_now_deprecation(
+    tmp_path: Path, default_context: dict[str, str | bool]
+) -> None:
+    """Test copier copy does not call copier's deprecated now() global."""
+    with warnings.catch_warnings(record=True) as caught:
+        warnings.simplefilter("always")
+        generate_project(tmp_path, default_context)
+    messages = [str(w.message) for w in caught]
+    assert not [m for m in messages if "'now' will be removed" in m]
 
 
 def test_justfile_lint_command_structure(

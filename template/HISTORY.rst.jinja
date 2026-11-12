@@ -4,7 +4,9 @@ History
 =======
 
 
-{{ version }} - {{ now().strftime("%Y-%m-%d") }}
+{# strftime alone renders the local date; subtract the offset for UTC. -#}
+{% set local = "%Y-%m-%dT%H:%M:%S%z" | strftime | to_datetime("%Y-%m-%dT%H:%M:%S%z") -%}
+{{ version }} - {{ (local - local.utcoffset()).strftime("%Y-%m-%d") }}
 ------------
 
 * initial released version
