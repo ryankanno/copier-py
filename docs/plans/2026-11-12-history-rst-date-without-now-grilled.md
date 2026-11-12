@@ -10,7 +10,7 @@
 ## Assumptions
 - [verified] Copier does not add the template directory to `sys.path`, so a local `_jinja_extensions` module needs `copier-templates-extensions`.
 - [verified] Under `TZ=Etc/GMT-14` at 2026-11-12 19:35 UTC, the expression rendered `2026-11-12` while the local date was 2026-11-13, with no FutureWarning.
-- [unverified] `time.strftime("%z")` gives a numeric offset on Windows. To verify: run a copy on Windows. The test suite runs on macOS and Linux only.
+- [unverified] `time.strftime("%z")` gives a numeric offset on Windows. Microsoft's UCRT `strftime` doc defines `%z` as "The offset from UTC in ISO 8601 format". CPython 3.12 and 3.13 call the UCRT `strftime` with no `%z` special case. To verify: run a copy on Windows. The test suite runs on macOS and Linux only.
 
 ## Risks
 - `jinja2_ansible_filters` changes `strftime` or `to_datetime`. Mitigation: `test_history_date_is_utc` fails.
