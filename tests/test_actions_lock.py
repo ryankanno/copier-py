@@ -29,7 +29,9 @@ def locked_workflows() -> set[str]:
     text = (WORKFLOWS_DIR / 'actions.lock').read_text(encoding='utf-8')
     section = WORKFLOWS_SECTION.search(text)
     assert section, 'actions.lock has no workflows section'
-    return {match['path'] for match in WORKFLOW_KEY.finditer(section['body'])}
+    paths = {match['path'] for match in WORKFLOW_KEY.finditer(section['body'])}
+    assert paths, 'actions.lock has no quoted workflow keys'
+    return paths
 
 
 def test_lockfile_covers_every_workflow() -> None:
