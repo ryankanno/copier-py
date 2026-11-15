@@ -23,17 +23,17 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@v7.0.1
         with:
           fetch-depth: 0
 
       - name: Configure Python ${{ env.PYTHON_VERSION }}
-        uses: actions/setup-python@v7
+        uses: actions/setup-python@v7.1.0
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
       - name: Install uv
-        uses: astral-sh/setup-uv@v7
+        uses: astral-sh/setup-uv@v7.6.0
         with:
           version: ${{ env.UV_VERSION }}
           enable-cache: true
@@ -67,14 +67,14 @@ jobs:
 
       - name: Upload docs artifact
         if: always()
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@v7.0.2
         with:
           name: html_docs
           path: ./artifact
 
       - name: Deploy to gh-pages
         if: github.event_name == 'push' || github.event_name == 'release'
-        uses: peaceiris/actions-gh-pages@v4
+        uses: peaceiris/actions-gh-pages@v4.1.0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: .tox/docs_out/
