@@ -86,7 +86,7 @@ git commit -m "ci: lock the root workflows' actions with gh-actions-lock"
 
 - [ ] **Step 1: Add the step**
 
-Add one step to the Contributing list: after a change to a `uses:` line or a new workflow, run `gh actions-lock` and commit `.github/workflows/actions.lock`. Link the extension's install section.
+Add one step to the Contributing list: after a change to a `uses:` line or a new workflow, run `gh actions-lock` and commit what it changes in `.github/workflows/` (`actions.lock` and any rewritten `uses:` refs). Link the extension's install section.
 
 - [ ] **Step 2: Commit**
 

@@ -5,7 +5,7 @@
 - Narrowing: run `gh actions-lock` with default narrowing. Partial refs such as `actions/checkout@v7` become full tags such as `@v7.0.1`.
 - Verify home: a new `.github/workflows/verify-lockfile.yml`, copied unchanged from the extension. It runs on every `pull_request` and on push to `main`, and installs the extension with `--pin v0.4.1`.
 - Pre-commit: no `gh actions-lock --verify-local` hook. The verify-lockfile CI check is the only gate.
-- Docs: one step in the README Contributing list: after a change to a `uses:` line or a new workflow, run `gh actions-lock` and commit `.github/workflows/actions.lock`.
+- Docs: one step in the README Contributing list: after a change to a `uses:` line or a new workflow, run `gh actions-lock` and commit what it changes in `.github/workflows/` (`actions.lock` and any rewritten `uses:` refs).
 - Test: `tests/test_actions_lock.py::test_lockfile_covers_every_workflow` reads `actions.lock` by regex and asserts that its `workflows:` keys equal the files in `.github/workflows/`. A local run shows `gh actions-lock --verify` exits 0 when complete and exits 1 on an unlocked `uses:` line.
 - Container images: accept the 4 `container-image` warnings (`wagoid/commitlint-github-action`, `aslafy-z/conventional-pr-title-action`, `codelytv/pr-size-labeler`, `wyrihaximus/github-action-wait-for-status`). File no follow-up issue.
 
