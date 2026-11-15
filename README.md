@@ -237,10 +237,12 @@ Contributions are very much appreciated.
 2. Create your feature branch (`git checkout -b feature/new-copier-feature`)
 3. Commit your changes (`git commit -m 'Added a new feature'`)
    - If you change a `uses:` line or add a workflow in `.github/workflows/`,
-     run `gh actions-lock` and commit `.github/workflows/actions.lock`. The
-     `verify-lockfile` check fails until you do. It needs the
+     run `gh actions-lock` and commit what it changes in `.github/workflows/`:
+     `actions.lock` and any `uses:` refs it rewrote. The `verify-lockfile`
+     check fails until you do. It needs the
      [`gh-actions-lock`](https://github.com/github/gh-actions-lock#install)
-     extension.
+     extension at the version CI pins:
+     `gh extension install github/gh-actions-lock --pin v0.4.1`.
 4. Push to the feature branch (`git push origin feature/new-copier-feature`)
 5. Open a PR! 🎆
 
