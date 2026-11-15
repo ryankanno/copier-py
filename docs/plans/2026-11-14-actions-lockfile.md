@@ -8,7 +8,7 @@
 
 **Tech Stack:** `gh` + `gh-actions-lock` v0.4.1, GitHub Actions, pytest (stdlib only).
 
-**Spec:** issue ryankanno/copier-py#107 (brief: `brief-issue107.md`). Decisions: `docs/plans/2026-11-14-actions-lockfile-grilled.md`.
+**Spec:** issue ryankanno/copier-py#107. Decisions: `docs/plans/2026-11-14-actions-lockfile-grilled.md`.
 
 ## Global Constraints
 
@@ -16,7 +16,7 @@
 - Change only the root `.github/` tree, its docs, and the tests. The template's workflows stay unchanged.
 - No change to `pyproject.toml` or `uv.lock`.
 - No skipped tests, no lowered checks.
-- Do not install, upgrade or remove any `gh` extension on the host.
+- The host already has the `gh-actions-lock` v0.4.1 extension. Do not install, upgrade or remove any `gh` extension on the host.
 - The CI job installs the extension with `--pin v0.4.1`.
 
 ## Review Focus
@@ -70,7 +70,7 @@ Expected: exit 0. The four `container-image` warnings stay.
 
 - [ ] **Step 7: Show that verify fails on an unlocked `uses:` line**
 
-Add `- uses: actions/hello-world-javascript-action@v1` to a copy of a step in `trufflehog.yml`. Run `gh actions-lock --verify`. Expected: exit 1 with a `not-pinned` finding. Revert the line with `git checkout -- .github/workflows/trufflehog.yml`.
+Add `- uses: actions/hello-world-javascript-action@v1` to a copy of a step in `trufflehog.yml`. Run `gh actions-lock --verify`. Expected: exit 1 with a `not-pinned` finding. Then delete only that line. Do not use `git checkout --` on the file: that also discards the Step 4 ref rewrites.
 
 - [ ] **Step 8: Commit**
 

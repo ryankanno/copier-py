@@ -1,7 +1,7 @@
 # Root workflows actions lockfile - Grilled
 
 ## Decisions
-- Dependabot: no change to `.github/dependabot.yml`. Dependabot regenerates the matching `actions.lock` entry in its bump PR. The auto-merge workflow waits for all checks, so a failed verify blocks a Dependabot merge.
+- Dependabot: no change to `.github/dependabot.yml`. Dependabot regenerates the matching `actions.lock` entry in its bump PR. The `github-actions` entry has no `automerge` label, so a person merges these PRs and sees the verify result.
 - Narrowing: run `gh actions-lock` with default narrowing. Partial refs such as `actions/checkout@v7` become full tags such as `@v7.0.1`.
 - Verify home: a new `.github/workflows/verify-lockfile.yml`, copied unchanged from the extension. It runs on every `pull_request` and on push to `main`, and installs the extension with `--pin v0.4.1`.
 - Pre-commit: no `gh actions-lock --verify-local` hook. The verify-lockfile CI check is the only gate.
@@ -13,7 +13,7 @@
 - [verified] Dependabot's `github-actions` updater regenerates `actions.lock` for onboarded workflows. Sources: GitHub docs "Lock workflow dependencies" ("Keep the lockfile current"), dependabot-core `github_actions/lib/dependabot/github_actions/lockfile/cli_engine.rb`, dependabot/dependabot-core#16799 (CLI v0.4.1, merged 2026-11-02), github/gh-actions-lock#257.
 - [verified] The repository has no rulesets (`gh api repos/ryankanno/copier-py/rulesets` returns `[]`), so no required check changes.
 - [verified] The lockfile pins action commits only. Image tags and Dockerfile `FROM` lines in the upstream action files stay mutable (github/gh-actions-lock README "Limitations", #236).
-- [unverified] `gh actions-lock --verify` exits 0 when only `container-image` warnings remain. To verify: plan Task 1 Step 6.
+- [verified] `gh actions-lock --verify` exits 0 when only `container-image` warnings remain. Plan Task 1 Step 6 printed "All 11 workflows valid".
 
 ## Risks
 - An upstream full tag moves, and verify fails until someone runs `gh actions-lock --relock`. Accepted: that failure is the purpose of the check.
