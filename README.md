@@ -242,7 +242,9 @@ Contributions are very much appreciated.
      check fails until you do. It needs the
      [`gh-actions-lock`](https://github.com/github/gh-actions-lock#install)
      extension at the version CI pins:
-     `gh extension install github/gh-actions-lock --pin v0.4.1`.
+     `gh extension install github/gh-actions-lock --pin v0.4.1`. The install
+     keeps a version that is already installed, so if `gh extension list`
+     shows another version, run `gh extension remove actions-lock` first.
 4. Push to the feature branch (`git push origin feature/new-copier-feature`)
 5. Open a PR! 🎆
 
