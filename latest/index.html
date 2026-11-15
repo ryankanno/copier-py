@@ -6,7 +6,7 @@
 <link rel="index" title="Index" href="genindex.html"><link rel="search" title="Search" href="search.html"><link rel="next" title="Tutorial: Create Your First Python Project" href="tutorial.html">
 
     <!-- Generated with Sphinx 9.1.1 and Furo 2025.12.19 -->
-        <title>copier-py 0.0.0-post.80 documentation</title>
+        <title>copier-py 0.0.0-post.81 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=8dab3a3b" />
@@ -162,7 +162,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="#"><div class="brand">copier-py 0.0.0-post.80 documentation</div></a>
+      <a href="#"><div class="brand">copier-py 0.0.0-post.81 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -183,7 +183,7 @@
       
       <div class="sidebar-sticky"><a class="sidebar-brand" href="#">
   
-  <span class="sidebar-brand-text">copier-py 0.0.0-post.80 documentation</span>
+  <span class="sidebar-brand-text">copier-py 0.0.0-post.81 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -504,7 +504,19 @@ PRs. The workflow won’t merge anything with a <code class="docutils literal no
 <ol class="arabic simple">
 <li><p>Fork the project</p></li>
 <li><p>Create your feature branch (<code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">checkout</span> <span class="pre">-b</span> <span class="pre">feature/new-copier-feature</span></code>)</p></li>
-<li><p>Commit your changes (<code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">commit</span> <span class="pre">-m</span> <span class="pre">'Added</span> <span class="pre">a</span> <span class="pre">new</span> <span class="pre">feature'</span></code>)</p></li>
+<li><p>Commit your changes (<code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">commit</span> <span class="pre">-m</span> <span class="pre">'Added</span> <span class="pre">a</span> <span class="pre">new</span> <span class="pre">feature'</span></code>)</p>
+<ul class="simple">
+<li><p>If you change a <code class="docutils literal notranslate"><span class="pre">uses:</span></code> line or add a workflow in <code class="docutils literal notranslate"><span class="pre">.github/workflows/</span></code>,
+run <code class="docutils literal notranslate"><span class="pre">gh</span> <span class="pre">actions-lock</span></code> and commit what it changes in <code class="docutils literal notranslate"><span class="pre">.github/workflows/</span></code>:
+<code class="docutils literal notranslate"><span class="pre">actions.lock</span></code> and any <code class="docutils literal notranslate"><span class="pre">uses:</span></code> refs it rewrote. The <code class="docutils literal notranslate"><span class="pre">verify-lockfile</span></code>
+check fails until you do. It needs the
+<a class="reference external" href="https://github.com/github/gh-actions-lock#install"><code class="docutils literal notranslate"><span class="pre">gh-actions-lock</span></code></a>
+extension at the version CI pins:
+<code class="docutils literal notranslate"><span class="pre">gh</span> <span class="pre">extension</span> <span class="pre">install</span> <span class="pre">github/gh-actions-lock</span> <span class="pre">--pin</span> <span class="pre">v0.4.1</span></code>. The install
+keeps a version that is already installed, so if <code class="docutils literal notranslate"><span class="pre">gh</span> <span class="pre">extension</span> <span class="pre">list</span></code>
+shows another version, run <code class="docutils literal notranslate"><span class="pre">gh</span> <span class="pre">extension</span> <span class="pre">remove</span> <span class="pre">actions-lock</span></code> first.</p></li>
+</ul>
+</li>
 <li><p>Push to the feature branch (<code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">push</span> <span class="pre">origin</span> <span class="pre">feature/new-copier-feature</span></code>)</p></li>
 <li><p>Open a PR! 🎆</p></li>
 </ol>
@@ -654,7 +666,7 @@ SOFTWARE.</p>
         <div class="bottom-of-page">
           <div class="left-details">
             <div class="copyright">
-                Copyright &#169; 2026, Ryan Kanno · build 3e67510
+                Copyright &#169; 2026, Ryan Kanno · build ebff066
             </div>
             Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
             
@@ -718,7 +730,7 @@ SOFTWARE.</p>
       
     </aside>
   </div>
-</div><script src="_static/documentation_options.js?v=8f5fe414"></script>
+</div><script src="_static/documentation_options.js?v=2b27600d"></script>
     <script src="_static/doctools.js?v=fd6eb6e6"></script>
     <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="_static/scripts/furo.js?v=46bd48cc"></script>
