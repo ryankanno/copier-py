@@ -1193,5 +1193,25 @@ def test_repo_docs_render_the_version_selector(
     ).is_file()
 
 
+PR_SIZE_LABELER_PERMISSIONS = "    permissions:\n      pull-requests: write\n"
+
+
+def test_pr_size_labeler_can_label_dependabot_prs(
+    tmp_path: Path, default_context: dict[str, str | bool]
+) -> None:
+    """Test the size labeler asks for write access to label PRs.
+
+    Dependabot PRs get a read-only token unless the workflow asks for more,
+    so without it the labeler fails with a 403 on every Dependabot PR.
+    """
+    dest = generate_project(tmp_path, default_context)
+
+    for root in (dest, Path(TEMPLATE_DIR)):
+        workflow = (
+            root / ".github" / "workflows" / "pr-size-labeler.yml"
+        ).read_text(encoding="utf-8")
+        assert PR_SIZE_LABELER_PERMISSIONS in workflow, root
+
+
 # vim: fenc=utf-8
 # vim: filetype=python
