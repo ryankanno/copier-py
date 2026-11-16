@@ -10,7 +10,7 @@ workflows:
         - 'actions/cache@v6.1.0'
         - 'actions/checkout@v7.0.1'
         - 'actions/setup-python@v7.1.0'
-        - 'astral-sh/setup-uv@v7.6.0'
+        - 'astral-sh/setup-uv@v10.3.3'
         - 'codecov/codecov-action@v7.1.1'
     '.github/workflows/codeql-analysis.yml':
         - 'actions/checkout@v7.0.1'
@@ -25,7 +25,7 @@ workflows:
         - 'actions/checkout@v7.0.1'
         - 'actions/setup-python@v7.1.0'
         - 'actions/upload-artifact@v7.0.2'
-        - 'astral-sh/setup-uv@v7.6.0'
+        - 'astral-sh/setup-uv@v10.3.3'
         - 'peaceiris/actions-gh-pages@v4.1.0'
     '.github/workflows/pr-labeler.yml':
         - 'actions/checkout@v7.0.1'
@@ -36,12 +36,12 @@ workflows:
         - 'actions/checkout@v7.0.1'
         - 'actions/setup-python@v7.1.0'
         - 'actions/upload-artifact@v7.0.2'
-        - 'astral-sh/setup-uv@v7.6.0'
+        - 'astral-sh/setup-uv@v10.3.3'
     '.github/workflows/release-drafter.yml':
         - 'release-drafter/release-drafter@v7.11.0'
     '.github/workflows/trufflehog.yml':
         - 'actions/checkout@v7.0.1'
-        - 'trufflesecurity/trufflehog@v3.99.8'
+        - 'trufflesecurity/trufflehog@v3.99.9'
     '.github/workflows/verify-lockfile.yml':
         - 'actions/checkout@v7.0.1'
 dependencies:
@@ -85,9 +85,9 @@ dependencies:
         commit: 'sha1-a0b851005a0f82ac983a56ead5a8111c0d8e044a'
         owner_id: 8191198
         repo_id: 230325635
-    'astral-sh/setup-uv@v7.6.0':
-        ref: 'v7.6.0'
-        commit: 'sha1-37802adc94f370d6bfd71619e3f0bf239e1f3b78'
+    'astral-sh/setup-uv@v10.3.3':
+        ref: 'v10.3.3'
+        commit: 'sha1-68559e99cc807c1eb7e9238fd43a15bba460eec2'
         owner_id: 115962839
         repo_id: 846733598
     'codecov/codecov-action@v7.1.1':
@@ -127,9 +127,9 @@ dependencies:
         commit: 'sha1-d1a19e60e81a7e650d00a7de9277f87e439117ea'
         owner_id: 58292376
         repo_id: 139022359
-    'trufflesecurity/trufflehog@v3.99.8':
-        ref: 'v3.99.8'
-        commit: 'sha1-ea68ca03c865c5f324e86e849ced20ed3cf9dbbb'
+    'trufflesecurity/trufflehog@v3.99.9':
+        ref: 'v3.99.9'
+        commit: 'sha1-3bd2b5887eb0efb8fa18bfd1d296032924e4ffdc'
         owner_id: 79229934
         repo_id: 77726177
     'wagoid/commitlint-github-action@v6.2.1':
