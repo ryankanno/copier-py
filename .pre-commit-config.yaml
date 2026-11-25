@@ -1,6 +1,6 @@
 repos:
   - repo: https://github.com/astral-sh/uv-pre-commit
-    rev: 0.13.6
+    rev: 0.13.7
     hooks:
       - id: uv-lock
   - repo: https://github.com/pre-commit/pre-commit-hooks
@@ -13,13 +13,13 @@ repos:
       - id: trailing-whitespace
         exclude: ^template/
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v2.4.0
+    rev: v2.4.1
     hooks:
       - id: mypy
         exclude: ^template/
         additional_dependencies: [pytest>=9.2.0]
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.17.3
+    rev: v0.17.4
     hooks:
     - id: ruff-check
       args: ['--config', 'pyproject.toml']
@@ -55,7 +55,7 @@ repos:
         args: ['--baseline', '.secrets.baseline']
         exclude: ^template/
   - repo: https://github.com/crate-ci/typos
-    rev: v1.51.1
+    rev: v1.52.1
     hooks:
       - id: typos
         args: ["--config", "_typos.toml", "--force-exclude"]
